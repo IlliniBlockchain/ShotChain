@@ -1,3 +1,5 @@
+use starknet::ContractAddress;
+
 pub mod Errors {
     pub const APPROVAL_ISSUE: felt252 = 'question not approved!';
 }
@@ -5,8 +7,8 @@ pub mod Errors {
 #[starknet::interface]
 trait IEscrow<T> {
     fn ask_question(ref self: T, bounty:u256);
-    fn assign(ref self: T, qid: u64); //assign answerer
-    fn answer(ref self: T); //answer
+    fn assign(ref self: T, qid: u64, answerer: ContractAddress); //assign answerer
+    fn answer(ref self: T, qid: u64, question_maker: ContractAddress); //answer
     fn approve(ref self: T); //i like the answer, transfer money to escrow
     fn deny(ref self: T); //in dispute state
     fn arbiter(ref self: T); //either approve or deny
@@ -15,7 +17,7 @@ trait IEscrow<T> {
 }
 #[starknet::contract]
 mod Escrow {
-
+    use super::Errors;
     use super::IERC20DispatcherTrait;
     use super::IERC20Dispatcher;
     use openzeppelin::token::erc20::interface;
@@ -68,16 +70,21 @@ mod Escrow {
         fn assign(ref self: ContractState, qid: u64, answerer: ContractAddress) {
             //check that (caller, qid), caller actually exists
             let caller: ContractAddress = get_caller_address();
-            if self.approvals.read(caller, qid) == caller {
-                
-            }
+            assert(self.approvals.read((caller, qid)) == caller, Errors::APPROVAL_ISSUE);
             
             //if not, revert. if so, change to approval
+            self.approvals.write((caller, qid), answerer);
 
             //thats it
         }
 
-        fn answer() {
+        fn answer(ref self: ContractState, qid: u64, question_maker: ContractAddress) {
+            //check that approval is met
+            let caller: ContractAddress = get_caller_address();
+            
+            assert(self.approvals.read((question_maker, qid)) == caller, Errors::APPROVAL_ISSUE);
+
+            //add answer id to answers
             
         }
     }
