@@ -31,7 +31,6 @@ app.get('/user/:address', async (req, res) => {
         const collection = db.collection('Users');
         const findResult = await collection.findOne({ address: address });
         if (findResult) {
-            console.log('Found document:', findResult);
             res.status(200).json(findResult);
         } else {
             res.status(200).json({});
@@ -60,7 +59,6 @@ app.get('/questions', async (req, res) => {
       // Find all items, sort them by createdAt in descending order (-1), and limit to 10
       const items = await collection.find({})
                                      .sort({ date: -1 })
-                                     .limit(10)
                                      .toArray();
       res.status(200).json(items);
     } catch (err) {
@@ -76,7 +74,6 @@ app.get('/questions', async (req, res) => {
       // Find all items, sort them by createdAt in descending order (-1), and limit to 10
       const findResult = await collection.findOne({ _id: new ObjectId(id) });
         if (findResult) {
-            console.log('Found document:', findResult);
             res.status(200).json(findResult);
         } else {
             res.status(200).json({});
@@ -91,7 +88,6 @@ app.get('/questions', async (req, res) => {
 
   app.post('/questions', async (req, res) => {
     const userData = req.body;
-    console.log(userData);
     userData.date = new Date();
     try {
         const collection = db.collection('Questions');
@@ -123,7 +119,6 @@ app.patch('/questions/:id/comment', async (req, res) => {
             return res.status(404).send('Question not found');
         }
 
-        console.log('Added comment to question:', updateResult);
         res.status(200).json(updateResult);
     } catch (err) {
         console.error('Error updating question with new comment:', err);
@@ -252,3 +247,86 @@ app.patch('/questions/commentVote', async (req, res) => {
         res.status(500).send('Error updating vote');
     }
 });
+
+app.get('/profileQuestionsTrue/:user', async (req, res) => {
+    const userId = req.params.user;
+  
+    try {
+      const collection = db.collection('Questions'); // Replace with your collection name
+      const query = { address: userId, done: true };
+      const documents = await collection.find(query).toArray();
+  
+      res.json(documents);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+
+  app.get('/profileQuestionsFalse/:user', async (req, res) => {
+    const userId = req.params.user;
+  
+    try {
+      const collection = db.collection('Questions'); // Replace with your collection name
+      const query = { address: userId, done: false };
+      const documents = await collection.find(query).toArray();
+  
+      res.json(documents);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+
+  app.get('/profileAnswersTrue/:user', async (req, res) => {
+    const { userId } = req.params.user;
+  
+    try {
+      const collection = db.collection('Questions'); // Replace with your collection name
+      const query = { selected: userId, done: true }; // Note the use of dot notation for nested documents
+      const documents = await collection.find(query).toArray();
+      res.json(documents);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+
+  app.get('/profileAnswersFalse/:user', async (req, res) => {
+    const { userId } = req.params.user;
+  
+    try {
+      const collection = db.collection('Questions'); // Replace with your collection name
+      const query = { selected: userId, done: false }; // Note the use of dot notation for nested documents
+      const documents = await collection.find(query).toArray();
+      res.json(documents);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  });
+
+
+  app.patch('/updateUser', async (req, res) => {
+    const { name, address, image, bio  } = req.body;
+    const updateData = {
+        name: name,
+        address: address,
+        image: image,
+        rep: 0,
+        bio: bio
+    };
+
+    try {
+        const collection = db.collection('Users'); // Replace with your collection name
+        const filter = { address: address };
+        const update = { $set: updateData };
+        const result = await collection.updateOne(filter, update);
+
+        if (result.matchedCount === 0) {
+            return res.status(404).send('User not found');
+        }
+
+        res.status(200).send('User updated successfully');
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+  
+  

@@ -3,8 +3,8 @@ import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AWS from "aws-sdk";
-import Web3 from 'web3'
 import Swal from 'sweetalert2';
+import secureLocalStorage from 'react-secure-storage';
 
 
 export default function Create() {
@@ -16,24 +16,9 @@ export default function Create() {
 
 
   useEffect(() => {
-    const loadWeb3 = async () => {
-      // Modern dapp browsers...
-      if (window.ethereum) {
-        const temp = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        if (temp) {
-            setAccount(temp[0]);
-        }
-      }
-      // Legacy dapp browsers...
-      else if (window.web3) {
-          window.web3 = new Web3(window.web3.currentProvider);
-      }
-      // Non-dapp browsers...
-      else {
-          window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
+    if (secureLocalStorage.getItem("key") != null) {
+      setAccount(secureLocalStorage.getItem("key"))
     }
-    loadWeb3().catch(console.error)
   }, [])
 
 
@@ -86,9 +71,16 @@ export default function Create() {
           .then(response => {
             formData.name = response.data.name;
             formData.pfp = response.data.image;
-            formData.upVotes = []
-            formData.downVotes = []
-            formData.comments = []
+            formData.comments = [];
+            formData.selected = "";
+            formData.answer = {
+              comment: "",
+              file: "",
+            }
+            formData.isDisputed = false;
+            formData.expiry = "";
+            formData.done = false;
+            
         try {
           axios.post('http://localhost:3001/questions', formData)
             .then(response => {
