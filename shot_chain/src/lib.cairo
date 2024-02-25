@@ -1,1 +1,2 @@
-mod escrow;
+mod components;
+mod contract;
