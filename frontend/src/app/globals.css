@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+html {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-container {
+    margin: 0;
+    padding: 0;
+    background: #555;
+    width: calc(100vw - (100vw - 100%));
+    height: 100vh;
+    background-image: linear-gradient(rgba(22, 21, 21, 0.7), rgba(22, 21, 21, 0.7)), url("/header.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sticky-nav {
+    width: calc(100vw - (100vw - 100%));
+    padding-left: 12rem;
+    padding-right: 12rem;
+}
+
+.header {
+    padding-bottom: 100px;
+    width: 1140px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 12rem;
+}
+
+.background-question {
+    background-color: #eeeeee;
+}
+
+.header__title{
+    color: white;
+    font-size: 3rem;
+    width: 750px;
+    padding: 0;
+    margin-bottom: 0px;
+    text-align: left;
+}
+.header__subtitle{
+    margin-top: 0;
+    margin-bottom: 45px;
+    font-size: 2rem;
+    color: #d3d1d1;
+    font-weight: 400;
+}
+.header__links {
+    margin-top: -10px;
+}
+.header__link {
+    cursor: pointer;
+    margin-right: 20px;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid #FF8A8A;
+    transition: 0.15s;
+}
+.header__link:first-of-type{
+    color: white;
+    background: #1fc6d8;
+}
+.header__link:first-of-type:hover{
+    background: rgb(40, 163, 180);
+    border: 1px solid rgb(40, 163, 180);
+}
+
+.page-item {
+    color: black;
+}
+
+.active {
+    background-color: rgb(76, 76, 180);
+    color: white !important;
+}
+
