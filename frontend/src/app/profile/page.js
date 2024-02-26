@@ -74,7 +74,18 @@ const Profile = () => {
     useEffect(() => {
       const fetchProfile = async () => {
         await axios.get(`http://localhost:3001/profileQuestionsFalse/${secureLocalStorage.getItem('key')}`).then(response => {
-          setActiveQuestions(response.data)
+          console.log("JAMES", secureLocalStorage.getItem('key'))
+          const filteredData = response.data.filter(item => {
+            const itemDate = new Date(item.date);
+            const days = Number(item.appDeadline);
+            const millisecondsPerDay = 24 * 60 * 60 * 1000;
+            const addedTime = days * millisecondsPerDay;
+            const newTimestamp = itemDate.getTime() + addedTime;
+            const newDate = new Date(newTimestamp);
+            const currentDate = new Date();
+            return newDate > currentDate;
+          });
+          setActiveQuestions(filteredData)
         })
 
         await axios.get(`http://localhost:3001/profileQuestionsTrue/${secureLocalStorage.getItem('key')}`).then(response => {
@@ -82,7 +93,6 @@ const Profile = () => {
         })
 
         await axios.get(`http://localhost:3001/profileAnswersFalse/${secureLocalStorage.getItem('key')}`).then(response => {
-          console.log(response.data)
           setActiveAnswers(response.data)
         })
 
@@ -338,11 +348,12 @@ const Profile = () => {
         <ul className="space-y-4">
           {(selA == "Active Answers" ? activeAnswers : pastAnswers).map((comment) => (
             <li key={comment.id} className="bg-gray-100 p-4 rounded-lg flex">
-              <img src={comment.pfp} alt="profile" className="w-10 h-10 rounded-full mr-4" />
+              <img src={comment.pfp} alt="profile" className="cursor-pointer w-10 h-10 rounded-full mr-4" onClick={() => onProfileClick(comment.address)}/>
               <div>
                 <p className="font-semibold">{comment.name}</p>
-                <p>{comment.comment}</p>
+                <p>{comment.answer.comment}</p>
               </div>
+              <a href={comment.answer.file} download>Download File</a>
             </li>
           ))}
         </ul>

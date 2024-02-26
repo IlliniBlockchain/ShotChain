@@ -88,9 +88,9 @@ const Case3 = ({id, account}) => {
     <form onSubmit={handleAddComment}>
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Application</h2>
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Answer</h2>
           <p className="mt-1 text-sm leading-6 text-gray-600">
-            Apply to answer this question!
+            Please submit an Answer
           </p>
 
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

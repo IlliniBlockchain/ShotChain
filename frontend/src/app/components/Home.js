@@ -22,8 +22,18 @@ export default function Home() {
   useEffect(() => {
     const loadQuestions = async () => {
       axios.get(`http://localhost:3001/questions`).then(response => {
-        console.log(response.data)
-        setQuestions(response.data)
+        const filteredData = response.data.filter(item => {
+          const itemDate = new Date(item.date);
+          const days = Number(item.appDeadline);
+          const millisecondsPerDay = 24 * 60 * 60 * 1000;
+          const addedTime = days * millisecondsPerDay;
+          const newTimestamp = itemDate.getTime() + addedTime;
+          const newDate = new Date(newTimestamp);
+          const currentDate = new Date();
+          return newDate > currentDate;
+        });
+        console.log(filteredData)
+        setQuestions(filteredData)
         setLoading(false)
       })
     }

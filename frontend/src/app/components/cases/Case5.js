@@ -16,7 +16,8 @@ const Case5 = ({id, account}) => {
         feedback: {
           feedback: feedback,
           rating: rating // This will be an empty string if there's no file, which is fine
-        }
+        },
+        done: true,
       });
 
     if (rating == "Good") {

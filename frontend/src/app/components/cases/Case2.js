@@ -11,7 +11,11 @@ const Case2 = ({id, account}) => {
       const response = await axios.patch(`http://localhost:3001/questions/${id}`, {
         selected: address
       });
-      console.log('Question updated:', response.data);
+      Swal.fire({
+        title: "Good job!",
+        text: "You have successfully picked your applicant!",
+        icon: "success"
+      });
       return response.data;
     } catch (error) {
       console.error('Error updating question:', error);
@@ -85,7 +89,7 @@ const Case2 = ({id, account}) => {
               <button
         type="button"
         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        onClick={updateQuestion(comment.address)}
+        onClick={() => updateQuestion(comment.address)}
       >
         Select User
       </button>
