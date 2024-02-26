@@ -11,7 +11,7 @@ export default function Home() {
   const [account, setAccount] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1)
-  const recordsPerPage = 7
+  const recordsPerPage = 10
   const lastIndex = currentPage * recordsPerPage
   const firstIndex = lastIndex - recordsPerPage;
   const records = questions.slice(firstIndex, lastIndex)
@@ -28,10 +28,10 @@ export default function Home() {
       })
     }
     loadQuestions().catch(console.error)
-      if (secureLocalStorage.getItem("key") != null) {
-        setAccount(secureLocalStorage.getItem("key"))
-      }
-    
+    if (secureLocalStorage.getItem("key") != null) {
+      setAccount(secureLocalStorage.getItem("key"))
+    }
+
   }, [])
 
 
@@ -68,18 +68,24 @@ export default function Home() {
                         <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-gray-900/10" />
                       </div>
                       <div>
-                        <div className="flex items-center gap-x-4 text-xs">
+                        <div className="flex items-center gap-x-4 text-xs mt-4">
                           <time dateTime={post.datetime} className="text-gray-500">
-                            {post.date}
+                            {formatDate(post.date)}
                           </time>
                           <div
-                            className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 flex flex-row"
+                            className="text-gray-500 relative z-10 rounded-full bounty px-3 py-1.5 font-medium text-gray-600 flex flex-row"
                           >
-                            <img src="/strk.jpeg" height={20} width={20}></img>
-                            <p className="ml-2 text-lg">
+                            <img src="/strk.jpeg" height={10} width={15}></img>
+                            <p className="ml-2">
                               {post.bounty}
                             </p>
                           </div>
+                          <time dateTime={post.datetime} className="text-gray-500 relative z-10 rounded-full app-deadline px-3 py-1.5 font-medium text-gray-600 flex flex-row">
+                            {formatAppDeadline(post.date, post.appDeadline)}
+                          </time>
+                          <time dateTime={post.datetime} className="text-gray-500 relative z-10 rounded-full ans-deadline px-3 py-1.5 font-medium text-gray-600 flex flex-row">
+                            {formatAnsDeadline(post.answerDeadline)}
+                          </time>
                         </div>
                         <div className="group relative max-w-xl">
                           <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
@@ -115,7 +121,7 @@ export default function Home() {
       }
 
       <nav>
-        <ul className="pagination isolate inline-flex -space-x-px rounded-md shadow-sm mb-16">
+        <ul className="pagination isolate inline-flex ml-48 -space-x-px rounded-md shadow-sm mb-16">
           <li className="page-item">
             <a href='#questions' className='relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 text-sm' onClick={prePage}>Prev</a>
           </li>
@@ -135,6 +141,62 @@ export default function Home() {
 
     </div >
   )
+
+  function formatDate(ISOdate) {
+    const postdate = new Date(ISOdate)
+    const now = new Date();
+    const msDifference = now - postdate
+
+    const dayDifference = Math.floor(msDifference / (1000 * 60 * 60 * 24))
+    if (dayDifference != 0) return `${dayDifference} day${dayDifference != 1 ? "s" : ""} ago`
+
+    const hrDifference = Math.floor(msDifference / (1000 * 60 * 60))
+    if (hrDifference != 0) return `${hrDifference} hour${hrDifference != 1 ? "s" : ""} ago`
+
+    const minDifference = Math.floor(msDifference / (1000 * 60))
+    if (minDifference != 0) return `${minDifference} minute${minDifference != 1 ? "s" : ""} ago`
+
+    const secDifference = Math.floor(msDifference / 1000)
+    return `${secDifference} second${secDifference != 1 ? "s" : ""} ago`
+  }
+
+  function formatAppDeadline(ISOdate, appDeadline) {
+    const postdate = new Date(ISOdate)
+    const now = new Date();
+    const msDifference = now - postdate
+
+    const daysElapsed = Math.floor(msDifference / (1000 * 60 * 60 * 24))
+    if (parseFloat(appDeadline) - daysElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) - daysElapsed - 1)} day${parseFloat(appDeadline) - daysElapsed - 1 == 1 ? "" : "s"}`;
+
+    const hrsElapsed = Math.floor(msDifference / (1000 * 60 * 60))
+    if (parseFloat(appDeadline) * 24 - hrsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 - hrsElapsed - 1)} hour${parseFloat(appDeadline) * 24 - hrsElapsed - 1 == 1 ? "" : "s"}`;
+
+    const minsElapsed = Math.floor(msDifference / (1000 * 60))
+    if (parseFloat(appDeadline) * 24 * 60 - minsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 * 60 - minsElapsed - 1)} minute${parseFloat(appDeadline) - minsElapsed - 1 == 1 ? "" : "s"}`;
+
+    const secsElapsed = Math.floor(msDifference / (1000))
+    if (parseFloat(appDeadline) * 24 * 60 * 60 - secsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 * 60 * 60 - secsElapsed - 1)} second${parseFloat(appDeadline) - secsElapsed - 1 == 1 ? "" : "s"}`;
+
+    return "Application deadline passed"
+  }
+
+  function formatAnsDeadline(ansDeadline) {
+
+    const days = parseInt(parseFloat(ansDeadline))
+    if (days >= 1) return `${days} day${days != 1 ? "" : ""} return time`
+
+    const hours = parseInt(parseFloat(ansDeadline) * 24)
+    if (hours >= 1) return `${hours} hour${hours != 1 ? "" : ""} return time`
+
+    const minutes = parseInt(parseFloat(ansDeadline) * 24 * 60)
+    if (minutes >= 1) return `${minutes} minute${minutes != 1 ? "" : ""} return time`
+
+    const seconds = parseInt(parseFloat(ansDeadline) * 24 * 60 * 60)
+    if (seconds >= 1) return `${seconds} second${seconds != 1 ? "" : ""} return time`
+
+    return ""
+  }
+
 
   function prePage() {
     if (currentPage != 1) {
