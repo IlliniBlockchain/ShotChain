@@ -12,12 +12,12 @@ import Case0 from './cases/Case0';
 import Case7 from './cases/Case7';
 import Case8 from './cases/Case8';
 
-const Application = ({id}) => {
-const [questionData, setQuestionData] = useState(null);
-const [account, setAccount] = useState('');
-let ex = 0;
+const Application = ({ id }) => {
+  const [questionData, setQuestionData] = useState(null);
+  const [account, setAccount] = useState('');
+  let ex = 0;
 
-useEffect(() => {
+  useEffect(() => {
     const fetchQuestionData = async () => {
       try {
         const response = await fetch(`http://localhost:3001/questions/${id}`); // Adjust the URL/port as needed
@@ -60,30 +60,30 @@ useEffect(() => {
   const renderPage = () => {
     switch (ex) {
       case 1:
-        return <Case1 id={id} account={account}/>;
+        return <Case1 id={id} account={account} />;
       case 2:
-        return <Case2 id={id} account={account}/>;
+        return <Case2 id={id} account={account} />;
       case 3:
-        return <Case3 id={id} account={account}/>;
+        return <Case3 id={id} account={account} />;
       case 4:
-        return <Case4 id={id} account={account}/>;
+        return <Case4 id={id} account={account} />;
       case 5:
-        return <Case5 id={id} account={account}/>;
+        return <Case5 id={id} account={account} />;
       case 6:
-        return <Case6 id={id} account={account}/>;
+        return <Case6 id={id} account={account} />;
       case 7:
         return <Case7 id={id} account={account}/>;
       case 8:
         return <Case8/>;
       default:
-        return <Case0 id={id} account={account}/>;
+        return <Case0 id={id} account={account} />;
     }
   };
 
 
   return (
     <div>
-        {renderPage()}
+      {renderPage()}
     </div>
   )
 }

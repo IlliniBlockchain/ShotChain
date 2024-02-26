@@ -1,9 +1,9 @@
 "use client"
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const Case2 = ({id, account}) => {
+const Case2 = ({ id, account }) => {
   const [comments, setComments] = useState([]);
 
   const updateQuestion = async (address) => {
@@ -42,7 +42,7 @@ const Case2 = ({id, account}) => {
         // Fetch comments
         const response = await axios.get(`http://localhost:3001/questions/${id}/comments`);
         let commentsWithUserData = [];
-  
+
         // Loop through each comment to fetch user data
         for (const comment of response.data || []) {
           try {
@@ -62,14 +62,14 @@ const Case2 = ({id, account}) => {
             commentsWithUserData.push(comment); // Adds the comment without user data
           }
         }
-  
+
         // Update state with comments that now include user data
         setComments(commentsWithUserData);
       } catch (error) {
         console.error("Failed to fetch comments", error);
       }
     };
-  
+
     fetchCommentsAndUsers();
   }, []);
 

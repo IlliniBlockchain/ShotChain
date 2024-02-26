@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
+import { formatAnsDeadline, formatAppDeadline, formatDate } from '../date.js'
 
 export default function Home() {
 
@@ -56,16 +57,35 @@ export default function Home() {
               <div class="header__links">
                 <a class="header__link" href="http://localhost:3000/create" target="_blank">Post a Question</a>
               </div>
-
             </div>
           </div>
-          <div className="max-w-7xl  mx-48 my-32">
-            <div className="max-w-2xl lg:max-w-4xl">
-              <h2 id="questions" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Trending on ShotChain</h2>
-              <p className="mt-2 text-lg leading-8 text-gray-600">
+
+          <div className="about-container">
+            <div class="about flex flex-col max-w-7xl  mx-48 py-32 lg:max-w-6xl">
+              <h2 id="" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">How it Works</h2>
+              <p className="mt-2 text-lg leading-8 text-gray-600 sm:text-2xl">
+                Follow these instructions to get started.
+              </p>
+              <div className="flex flex-row my-16">
+                <div className="pr-12">
+                  <p className="font-bold sm:text-3xl mb-8">Business Strategy</p>
+                  <p className="sm:text-xl">We strive to effectively tackle our clients' short and long term business challenges across areas such as market entry, competitor analysis, acquisitions, product development, and more.</p>
+                </div>
+                <div className="pl-12">
+                  <p className="font-bold sm:text-3xl mb-8">Tech Strategy</p>
+                  <p className="sm:text-xl">We specialize in assisting our client companies in their technical endeavors through analysis of emerging technologies, research of potential applications, writing whitepapers, and more.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-7xl  mx-48 mt-32 mb-12">
+            <div className="max-w-2xl lg:max-w-6xl">
+              <h2 id="questions" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Trending on ShotChain</h2>
+              <p className="mt-2 text-lg leading-8 text-gray-600 sm:text-2xl">
                 Answer Questions to earn Bounties!
               </p>
-              <div className="mt-16 space-y-20 lg:mt-20 lg:space-y-20">
+              <div className="space-y-20 lg:mt-16 lg:space-y-20">
                 {records.map((post) => (
                   <a href={`/question/${post._id}`}>
                     <article key={post.id} className="background-question rounded-2xl my-8 relative isolate flex flex-col gap-8 lg:flex-row">
@@ -130,8 +150,8 @@ export default function Home() {
         </div>
       }
 
-      <nav>
-        <ul className="pagination isolate inline-flex ml-48 -space-x-px rounded-md shadow-sm mb-16">
+      <nav className="lg:max-w-6x1 mx-48 mb-32 pp">
+        <ul className="pagination isolate inline-flex -space-x-px rounded-md shadow-sm">
           <li className="page-item">
             <a href='#questions' className='relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 text-sm' onClick={prePage}>Prev</a>
           </li>
@@ -148,65 +168,15 @@ export default function Home() {
         </ul>
       </nav>
 
+      <div className="about-container">
+        <div class="about flex flex-col max-w-7xl mx-48 py-16 lg:max-w-6xl">
+
+        </div>
+      </div>
+
 
     </div >
   )
-
-  function formatDate(ISOdate) {
-    const postdate = new Date(ISOdate)
-    const now = new Date();
-    const msDifference = now - postdate
-
-    const dayDifference = Math.floor(msDifference / (1000 * 60 * 60 * 24))
-    if (dayDifference != 0) return `${dayDifference} day${dayDifference != 1 ? "s" : ""} ago`
-
-    const hrDifference = Math.floor(msDifference / (1000 * 60 * 60))
-    if (hrDifference != 0) return `${hrDifference} hour${hrDifference != 1 ? "s" : ""} ago`
-
-    const minDifference = Math.floor(msDifference / (1000 * 60))
-    if (minDifference != 0) return `${minDifference} minute${minDifference != 1 ? "s" : ""} ago`
-
-    const secDifference = Math.floor(msDifference / 1000)
-    return `${secDifference} second${secDifference != 1 ? "s" : ""} ago`
-  }
-
-  function formatAppDeadline(ISOdate, appDeadline) {
-    const postdate = new Date(ISOdate)
-    const now = new Date();
-    const msDifference = now - postdate
-
-    const daysElapsed = Math.floor(msDifference / (1000 * 60 * 60 * 24))
-    if (parseFloat(appDeadline) - daysElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) - daysElapsed - 1)} day${parseFloat(appDeadline) - daysElapsed - 1 == 1 ? "" : "s"}`;
-
-    const hrsElapsed = Math.floor(msDifference / (1000 * 60 * 60))
-    if (parseFloat(appDeadline) * 24 - hrsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 - hrsElapsed - 1)} hour${parseFloat(appDeadline) * 24 - hrsElapsed - 1 == 1 ? "" : "s"}`;
-
-    const minsElapsed = Math.floor(msDifference / (1000 * 60))
-    if (parseFloat(appDeadline) * 24 * 60 - minsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 * 60 - minsElapsed - 1)} minute${parseFloat(appDeadline) - minsElapsed - 1 == 1 ? "" : "s"}`;
-
-    const secsElapsed = Math.floor(msDifference / (1000))
-    if (parseFloat(appDeadline) * 24 * 60 * 60 - secsElapsed - 1 >= 1) return `Application due in ${parseInt(parseFloat(appDeadline) * 24 * 60 * 60 - secsElapsed - 1)} second${parseFloat(appDeadline) - secsElapsed - 1 == 1 ? "" : "s"}`;
-
-    return "Application deadline passed"
-  }
-
-  function formatAnsDeadline(ansDeadline) {
-
-    const days = parseInt(parseFloat(ansDeadline))
-    if (days >= 1) return `${days} day${days != 1 ? "" : ""} return time`
-
-    const hours = parseInt(parseFloat(ansDeadline) * 24)
-    if (hours >= 1) return `${hours} hour${hours != 1 ? "" : ""} return time`
-
-    const minutes = parseInt(parseFloat(ansDeadline) * 24 * 60)
-    if (minutes >= 1) return `${minutes} minute${minutes != 1 ? "" : ""} return time`
-
-    const seconds = parseInt(parseFloat(ansDeadline) * 24 * 60 * 60)
-    if (seconds >= 1) return `${seconds} second${seconds != 1 ? "" : ""} return time`
-
-    return ""
-  }
-
 
   function prePage() {
     if (currentPage != 1) {
