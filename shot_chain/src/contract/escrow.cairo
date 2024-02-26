@@ -13,8 +13,8 @@ trait IEscrow<T> {
    fn ask_question(ref self: T, bounty:u256);
     fn assign(ref self: T, qid: u64, answerer: ContractAddress); //assign answerer
     fn answer(ref self: T, qid: u64, question_maker: ContractAddress); //answer
-    fn approve(ref self: T, qid: u64); //i like the answer, transfer money to escrow //fn approve(ref self: ContractState, qid: u64)
-    fn deny(ref self: T, qid: u64); //in dispute state // fn approve(ref self: ContractState, qid: u64)
+    fn approve(ref self: T, qid: u64, question_answerer: ContractAddress); //i like the answer, transfer money to escrow //fn approve(ref self: ContractState, qid: u64)
+    fn deny(ref self: T, qid: u64, question_answerer: ContractAddress); //in dispute state // fn approve(ref self: ContractState, qid: u64)
     fn arbiter(ref self: T, qid: u64, question_maker: ContractAddress, decision: bool); //either approve or deny
 
     // getter for question id and answer id
@@ -26,37 +26,32 @@ mod Escrow {
     // use super::IERC20DispatcherTrait;
     // use super::IERC20Dispatcher;
     use openzeppelin::token::erc20::interface;
-    //use super::ITokenWrapper;
     
     use super::IEscrow;
     use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet::get_contract_address;
     
-    use openzeppelin::token::erc20::ERC20Component;
-    use openzeppelin::access::ownable::OwnableComponent;
+    // use openzeppelin::token::erc20::ERC20Component;
+    // use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::token::erc20::interface::IERC20Dispatcher;
 
-    use openzeppelin::token::erc20::interface::IERC20CamelOnly;
-    use openzeppelin::token::erc20::interface::IERC20DispatcherTrait;
-    use openzeppelin::token::erc20::erc20::ERC20Component::InternalTrait;
+    // use openzeppelin::token::erc20::interface::IERC20CamelOnly;
+    // use openzeppelin::token::erc20::interface::IERC20DispatcherTrait;
+    //use openzeppelin::token::erc20::erc20::ERC20Component::InternalTrait;
    
     use openzeppelin::token::erc20;
-
-    //use super::IEscrow;
-    //use starknet::ContractAddress;
-    // use starknet::get_caller_address;
-    // use starknet::get_contract_address;
     
     use shot_chain::components::custom::component::CustomComponent;
 
-    component!(path: ERC20Component, storage: erc20, event: ERC20Event);
+    // component!(path: ERC20Component, storage: erc20, event: ERC20Event);
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: CustomComponent, storage: custom, event: CustomEvent);
 
 
     #[storage]
     struct Storage {
+        mint_addr: ContractAddress,
         oracle_addr: ContractAddress,
         question_id: u64,
         answer_id: u64,
@@ -85,7 +80,8 @@ mod Escrow {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, oracle: ContractAddress) {
+    fn constructor(ref self: ContractState, oracle: ContractAddress, mint: ContractAddress) {
+        self.mint_addr.write(mint);
         self.oracle_addr.write(oracle);
         self.question_id.write(0_u64);
         self.answer_id.write(0_u64);
@@ -103,7 +99,7 @@ mod Escrow {
             self.question_id.write(current_qid);
 
             
-            IERC20Dispatcher { contract_address: caller, }.transfer(contract, bounty);
+            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(contract, bounty);
            
             // increment balances
         
@@ -139,27 +135,30 @@ mod Escrow {
             self.answer_id.write(curr_ans_id);
         }
 
-        fn approve(ref self: ContractState, qid: u64) {
+        fn approve(ref self: ContractState, qid: u64, question_answerer: ContractAddress) {
             let caller: ContractAddress = get_caller_address();
             let answerer: ContractAddress = self.approvals.read((caller, qid));
             let contract: ContractAddress = get_contract_address();
+
             //verify answered
+            assert(answerer == question_answerer, Errors::NOT_ANSWERED);
             assert(self.answers.read(qid) != 0, Errors::NOT_ANSWERED);
 
-            let balances = self.balances.read(qid);
+            let balance = self.balances.read(qid);
 
             //TRANSFER TO THE ANSWERER // how much to transfer
-            IERC20Dispatcher { contract_address: contract, }.transfer(answerer, balances);
+            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer_from(caller,answerer, balance);
 
             //set the balances to 0 for that qid
             self.balances.write(qid, 0);
         }
 
-        fn deny(ref self: ContractState, qid: u64) { //DONE
+        fn deny(ref self: ContractState, qid: u64, question_answerer: ContractAddress) { //DONE
             let caller: ContractAddress = get_caller_address();
             let answerer: ContractAddress = self.approvals.read((caller, qid));
-
+            
             //check if answerer answered
+            assert(answerer == question_answerer, Errors::NOT_ANSWERED);
             assert(self.answers.read(qid) != 0, Errors::NOT_ANSWERED);
 
             //set this as a dispute status
@@ -185,9 +184,9 @@ mod Escrow {
 
             //TRANSFER TO THE PERSON BASED ON DECISION
             if(decision) {
-                IERC20Dispatcher { contract_address: contract, }.transfer(question_maker, balance);
+                IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(question_maker, balance);
             } else {
-                IERC20Dispatcher { contract_address: contract, }.transfer(answerer, balance);
+                IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(answerer, balance);
             }
 
             //set balances to 0
