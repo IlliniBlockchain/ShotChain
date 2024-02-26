@@ -110,3 +110,12 @@ html {
     align-items: center;
     justify-content: center;
 }
+
+.download {
+    color: rgb(24, 115, 176);
+    font-size: 0.85rem;
+}
+
+.download:hover {
+    color: rgb(38, 141, 209);
+}
