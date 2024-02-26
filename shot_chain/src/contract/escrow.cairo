@@ -60,25 +60,7 @@ mod Escrow {
         answers: LegacyMap::<u64, u64>, // qId -> Answer Id
         balances: LegacyMap::<u64, u256>, //qId -> balance
         dispute_status: LegacyMap::<u64, bool>, //qID -> isInDispute?
-
-        // #[substorage(v0)]
-        // erc20: ERC20Component::Storage,
-        // #[substorage(v0)]
-        // custom: CustomComponent::Storage,
-        // #[substorage(v0)]
-        // ownable: OwnableComponent::Storage,
     }
-
-    // #[event]
-    // #[derive(Drop, starknet::Event)]
-    // enum Event {
-    //     #[flat]
-    //     ERC20Event: ERC20Component::Event,
-    //     #[flat]
-    //     CustomEvent: CustomComponent::Event,
-    //     #[flat]
-    //     OwnableEvent: OwnableComponent::Event,
-    // }
 
     #[constructor]
     fn constructor(ref self: ContractState, oracle: ContractAddress, mint: ContractAddress) {
@@ -100,7 +82,7 @@ mod Escrow {
             self.question_id.write(current_qid);
 
             
-            IERC20Dispatcher { contract_address: self.mint_addr.read()}.transfer(contract, bounty);
+            IERC20Dispatcher { contract_address: self.mint_addr.read()}.transfer_from(caller, contract, bounty);
            
             // increment balances
         
@@ -139,7 +121,7 @@ mod Escrow {
         fn approve(ref self: ContractState, qid: u64, question_answerer: ContractAddress) {
             let caller: ContractAddress = get_caller_address();
             let answerer: ContractAddress = self.approvals.read((caller, qid));
-            let contract: ContractAddress = get_contract_address();
+            // let contract: ContractAddress = get_contract_address();
 
             //verify answered
             assert(answerer == question_answerer, Errors::NOT_ANSWERED);
@@ -148,7 +130,7 @@ mod Escrow {
             let balance = self.balances.read(qid);
 
             //TRANSFER TO THE ANSWERER // how much to transfer
-            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer_from(caller,answerer, balance);
+            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(answerer, balance);
 
             //set the balances to 0 for that qid
             self.balances.write(qid, 0);
@@ -185,13 +167,15 @@ mod Escrow {
 
             //TRANSFER TO THE PERSON BASED ON DECISION
             if(decision) {
-                IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(question_maker, balance);
+                //instead of this, put question back in original state
+                self.dispute_status.write(qid, false);
+                self.answers.write(qid, 0);
+                self.approvals.write((question_maker, qid), question_maker);
             } else {
                 IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(answerer, balance);
-            }
 
-            //set balances to 0
-            self.balances.write(qid, 0);
+                self.balances.write(qid, 0);
+            }
         }
     }
 }
