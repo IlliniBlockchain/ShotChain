@@ -63,80 +63,50 @@ export default function Create() {
     formData.title = title;
     formData.description = description;
     formData.bounty = bounty;
-    if (file) {
-      await uploadFile(file).then(result => {
-        formData.image = 'https://shotchain.s3.amazonaws.com/' + file.name;
-        formData.address =  account;
-        axios.get(`http://localhost:3001/user/${account}`)
+    await uploadFile(file).then(result => {
+      if (file) {
+      formData.image = 'https://shotchain.s3.amazonaws.com/' + file.name;
+      } else {
+        formData.image = 'default'
+      }
+      formData.address =  account;
+      axios.get(`http://localhost:3001/user/${account}`)
+        .then(response => {
+          formData.name = response.data.name;
+          formData.pfp = response.data.image;
+          formData.comments = [];
+          formData.selected = "";
+          formData.answer = {
+            comment: "",
+            file: "",
+          }
+          formData.isDisputed = false;
+          formData.expiry = "";
+          formData.done = false;
+          
+      try {
+        axios.post('http://localhost:3001/questions', formData)
           .then(response => {
-            formData.name = response.data.name;
-            formData.pfp = response.data.image;
-            formData.comments = [];
-            formData.selected = "";
-            formData.answer = {
-              comment: "",
-              file: "",
-            }
-            formData.isDisputed = false;
-            formData.expiry = "";
-            formData.done = false;
-            
-        try {
-          axios.post('http://localhost:3001/questions', formData)
-            .then(response => {
-                console.log('User created:', response.data);
-                // Optionally, clear the form or give user feedback
-                Swal.fire({
-                  title: "Congrats",
-                  text: "Your question has been successfully posted!",
-                  icon: "success"
-                });
-                setTitle('');
-                setDescription('');
-                setBounty(0);
-                setFile(null);
-            })
-            .catch(error => {
-                console.error('Error creating user:', error);
-            });
-        } catch (error) {
-          console.log(error);
-        }
+              console.log('User created:', response.data);
+              // Optionally, clear the form or give user feedback
+              Swal.fire({
+                title: "Congrats",
+                text: "Your question has been successfully posted!",
+                icon: "success"
+              });
+              setTitle('');
+              setDescription('');
+              setBounty(0);
+              setFile(null);
           })
-      });
-    } else {
-        formData.image = 'default';
-        formData.address =  account;
-        axios.get(`http://localhost:3001/user/${account}`)
-          .then(response => {
-            formData.name = response.data.name;
-            formData.pfp = response.data.image;
-            formData.upVotes = []
-            formData.downVotes = []
-            formData.comments = []
-        try {
-          axios.post('http://localhost:3001/questions', formData)
-            .then(response => {
-                console.log('User created:', response.data);
-                // Optionally, clear the form or give user feedback
-                Swal.fire({
-                  title: "Congrats",
-                  text: "Your question has been successfully posted!",
-                  icon: "success"
-                });
-                setTitle('');
-                setDescription('');
-                setBounty(0);
-                setFile(null);
-            })
-            .catch(error => {
-                console.error('Error creating user:', error);
-            });
-        } catch (error) {
-          console.log(error);
-        }
-      })
-    }
+          .catch(error => {
+              console.error('Error creating user:', error);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+        })
+    });
 
 
   };

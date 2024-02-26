@@ -24,8 +24,8 @@ html {
 
 .sticky-nav {
     width: calc(100vw - (100vw - 100%));
-    padding-left: 12rem;
-    padding-right: 12rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
 }
 
 .header {

@@ -149,105 +149,6 @@ app.get('/questions/:id/comments', async (req, res) => {
     }
 });
 
-app.patch('/questions/:id/vote', async (req, res) => {
-    const questionId = req.params.id;
-    const { userId, vote } = req.body; // Expecting 'vote' to be either 'upvote' or 'downvote'
-
-    try {
-        const collection = db.collection('Questions');
-        const question = await collection.findOne({ _id: new ObjectId(questionId) });
-
-        if (!question) {
-            return res.status(404).send('Question not found');
-        }
-
-        const updateQuery = {};
-        const addToSet = {};
-        const pull = {};
-
-        // If user wants to upvote
-        if (vote === 'upvote') {
-            // Check if user has not already upvoted
-            if (!question.upVotes.includes(userId)) {
-                addToSet.upVotes = userId;
-            }
-            // If user has downvoted before, remove them from downvotes
-            if (question.downVotes.includes(userId)) {
-                pull.downVotes = userId;
-            }
-        }
-        // If user wants to downvote
-        else if (vote === 'downvote') {
-            // Check if user has not already downvoted
-            if (!question.downVotes.includes(userId)) {
-                addToSet.downVotes = userId;
-            }
-            // If user has upvoted before, remove them from upvotes
-            if (question.upVotes.includes(userId)) {
-                pull.upVotes = userId;
-            }
-        }
-
-        if (Object.keys(addToSet).length > 0) {
-            updateQuery['$addToSet'] = addToSet;
-        }
-        if (Object.keys(pull).length > 0) {
-            updateQuery['$pull'] = pull;
-        }
-
-        // If there's something to update
-        if (Object.keys(updateQuery).length > 0) {
-            await collection.updateOne({ _id: new ObjectId(questionId) }, updateQuery);
-        }
-
-        res.status(200).send('Vote updated successfully');
-    } catch (err) {
-        console.error('Error updating vote:', err);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-
-app.patch('/questions/commentVote', async (req, res) => {
-    const { userId, vote, questionId, commentId  } = req.body; // Assume 'vote' is either 'upvote' or 'downvote'
-  
-    try {
-        const question = await db.collection('Questions').findOne({ _id: new ObjectId(questionId) });
-        if (!question) {
-            return res.status(404).send('Question not found');
-        }
-
-        const commentIndex = question.comments.findIndex(comment => comment.id === commentId);
-        if (commentIndex === -1) {
-            return res.status(404).send('Comment not found');
-        }
-
-        let updateOperation = { $set: {} };
-
-        // If adding an upvote/downvote, use $addToSet to ensure no duplicates
-        if (vote === 'upvote') {
-            updateOperation.$addToSet = { [`comments.${commentIndex}.upVotes`]: userId };
-            // Attempting to remove from downVotes if present
-            updateOperation.$pull = { [`comments.${commentIndex}.downVotes`]: userId };
-        } else if (vote === 'downvote') {
-            updateOperation.$addToSet = { [`comments.${commentIndex}.downVotes`]: userId };
-            // Attempting to remove from upVotes if present
-            updateOperation.$pull = { [`comments.${commentIndex}.upVotes`]: userId };
-        }
-    
-        // Execute MongoDB update
-        await db.collection('Questions').updateOne(
-            { _id: new ObjectId(questionId) },
-            updateOperation
-        );
-    
-        res.status(200).send('Vote updated');
-    } catch (err) {
-        console.error('Error updating vote:', err);
-        res.status(500).send('Error updating vote');
-    }
-});
-
 app.get('/profileQuestionsTrue/:user', async (req, res) => {
     const userId = req.params.user;
   
@@ -328,5 +229,53 @@ app.get('/profileQuestionsTrue/:user', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
+
+app.patch('/questions/:id', async (req, res) => {
+    try {
+      // Connect to the MongoDB client
+      const collection = db.collection("Questions");
   
+      const { id } = req.params;
+      const update = req.body;
+  
+      // Convert id from string to ObjectId
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: update,
+      };
+  
+      // Update the question document
+      const result = await collection.findOneAndUpdate(filter, updateDoc, { returnDocument: 'after' });
+  
+      res.json(result.value);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  });
+  
+  app.patch('/users/:address', async (req, res) => {
+    try {
+      // Connect to the MongoDB client
+      const collection = db.collection("Users");
+  
+      const { address } = req.params;
+      const update = req.body;
+  
+      // Convert id from string to ObjectId
+      const filter = {address: address };
+      const updateDoc = {
+        $set: update,
+      };
+  
+      // Update the question document
+      const result = await collection.findOneAndUpdate(filter, updateDoc, { returnDocument: 'after' });
+  
+      res.json(result.value);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  });
   
