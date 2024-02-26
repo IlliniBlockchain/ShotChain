@@ -154,6 +154,7 @@ export default function Create() {
                   text: "Your question has been successfully posted!",
                   icon: "success"
                 });
+                window.location.reload();
                 setTitle('');
                 setDescription('');
                 setBounty(0);

@@ -16,6 +16,7 @@ const Case2 = ({ id, account }) => {
         text: "You have successfully picked your applicant!",
         icon: "success"
       });
+      window.location.reload();
       return response.data;
     } catch (error) {
       console.error('Error updating question:', error);

@@ -37,11 +37,13 @@ const Application = ({ id }) => {
       setAccount(secureLocalStorage.getItem("key"))
     }
   }, []);
+
+
+
   if (questionData != null) {
     if (account != questionData.address && questionData.selected == "" && questionData.comments.every(obj => obj.value !== account)) {//Case 1, be able to apply
       ex = 1;
     } else if (account != questionData.address && questionData.selected == "" && !questionData.comments.every(obj => obj.value !== account)) {
-      ex = 8;
       ex = 8;
     } else if (account == questionData.address && questionData.selected == "") { //Case 2, see current applications
       ex = 2;
@@ -59,7 +61,6 @@ const Application = ({ id }) => {
       ex = 7;
     }
   }
-
 
   const renderPage = () => {
     switch (ex) {

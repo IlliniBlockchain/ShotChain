@@ -68,6 +68,7 @@ const Case1 = ({ id, account }) => {
         });
         setComment('');
         setFile(null);
+        window.location.reload();
       })
     } catch (error) {
       console.error("Failed to add comment", error);

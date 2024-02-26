@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 
 const Case5 = ({ id, account }) => {
   const [feedback, setFeedback] = useState('');
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState("Good");
   const [answer, setAnswer] = useState("");
 
   const handleSubmit = async (e) => {
@@ -19,7 +19,7 @@ const Case5 = ({ id, account }) => {
       },
       done: true,
     });
-
+    console.log(rating)
     if (rating == "Good") {
       // Fetch the current user's data to get the rep score
       const userResponse = await axios.get(`http://localhost:3001/user/${answer.address}`);
@@ -55,10 +55,8 @@ const Case5 = ({ id, account }) => {
       text: "Your feedback has been submitted",
       icon: "success"
     });
+    window.location.reload();
     setFeedback('');
-
-
-
   };
 
   useEffect(() => {

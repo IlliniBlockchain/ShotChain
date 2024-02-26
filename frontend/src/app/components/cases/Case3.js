@@ -73,6 +73,7 @@ const Case3 = ({ id, account }) => {
       // Optionally, re-fetch comments or update local state to include the new comment
       setComment('');
       setFile(null);
+      window.location.reload();
     } catch (error) {
       console.error("Failed to add comment", error);
     }
