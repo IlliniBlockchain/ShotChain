@@ -12,36 +12,36 @@ const uploadFile = async (addFile) => {
   const S3_BUCKET = "shotchain";
   const REGION = "us-east-1";
   AWS.config.update({
-  accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY,
-  secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY,
+    secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESS_KEY,
   });
   const s3 = new AWS.S3({
-  params: { Bucket: S3_BUCKET },
-  region: REGION,
+    params: { Bucket: S3_BUCKET },
+    region: REGION,
   });
 
   const params = {
-  Bucket: S3_BUCKET,
-  Key: addFile.name,
-  Body: addFile,
+    Bucket: S3_BUCKET,
+    Key: addFile.name,
+    Body: addFile,
   };
 
   var upload = s3
-  .putObject(params)
-  .on("httpUploadProgress", (evt) => {
+    .putObject(params)
+    .on("httpUploadProgress", (evt) => {
       console.log(
-      "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
+        "Uploading " + parseInt((evt.loaded * 100) / evt.total) + "%"
       );
-  })
-  .promise();
+    })
+    .promise();
 
   await upload.then((err, data) => {
-  console.log(err);
-  return 'https://shotchain.s3.amazonaws.com/' + addFile.name;
+    console.log(err);
+    return 'https://shotchain.s3.amazonaws.com/' + addFile.name;
   });
 };
 
-const Case1 = ({id, account}) => {
+const Case1 = ({ id, account }) => {
 
   const [comment, setComment] = useState('')
   const [file, setFile] = useState(null);
@@ -55,19 +55,19 @@ const Case1 = ({id, account}) => {
           fileName = 'https://shotchain.s3.amazonaws.com/' + file.name;
         }
         axios.patch(`http://localhost:3001/questions/${id}/comment`, {
-        address: account,
-        comment: comment,
-        file: fileName,
-        // You can add additional fields here as necessary, such as votes or profilePic
-      });
-      // Optionally, re-fetch comments or update local state to include the new comment
-      Swal.fire({
-        title: "Good job!",
-        text: "Your application has been successfully submitted!",
-        icon: "success"
-      });
-      setComment('');
-      setFile(null);
+          address: account,
+          comment: comment,
+          file: fileName,
+          // You can add additional fields here as necessary, such as votes or profilePic
+        });
+        // Optionally, re-fetch comments or update local state to include the new comment
+        Swal.fire({
+          title: "Good job!",
+          text: "Your application has been successfully submitted!",
+          icon: "success"
+        });
+        setComment('');
+        setFile(null);
       })
     } catch (error) {
       console.error("Failed to add comment", error);
@@ -80,7 +80,7 @@ const Case1 = ({id, account}) => {
 
 
   return (
-    <form onSubmit={handleAddComment}>
+    <form onSubmit={handleAddComment} className="mb-32">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">Application</h2>
@@ -120,7 +120,7 @@ const Case1 = ({id, account}) => {
                       className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
                       <span>Upload a file</span>
-                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange}/>
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} />
                     </label>
                     <p className="pl-1">or drag and drop</p>
                   </div>

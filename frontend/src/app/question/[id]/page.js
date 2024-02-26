@@ -37,9 +37,9 @@ const QuestionPage = () => {
   }, []); // The empty array ensures this effect runs only once after the initial render
 
   return (
-    <div>
+    <div className="mx-48">
       {questionData ? (
-        <div className="mt-16 space-y-20 lg:mt-20 lg:space-y-20 max-w-2xl lg:max-w-4xl">
+        <div className="mt-16 space-y-20 lg:mt-20 lg:space-y-20 max-w-2xl lg:max-w-7xl">
           <article key={questionData.id} className="background-question rounded-2xl my-8 relative isolate flex flex-col gap-8 lg:flex-row">
             <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:aspect-square lg:w-64 lg:shrink-0">
               <img
