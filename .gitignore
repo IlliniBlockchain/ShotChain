@@ -1,4 +1,0 @@
-*.env
-
-# Ignore all node_modules folders
-node_modules/
