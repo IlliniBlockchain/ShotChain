@@ -157,7 +157,6 @@ mod Escrow {
             //VERIFY DISPUTER IS THE ORACLE
             let disputer: ContractAddress = get_caller_address();
             let answerer: ContractAddress = self.approvals.read((question_maker, qid));
-            let contract: ContractAddress = get_contract_address();
 
             //verify disputer is the oracle
             let oracle: ContractAddress = self.oracle_addr.read();
