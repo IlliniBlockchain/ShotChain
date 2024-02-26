@@ -19,6 +19,9 @@ trait IEscrow<T> {
     fn arbiter(ref self: T, qid: u64, question_maker: ContractAddress, decision: bool); //either approve or deny
 
     // getter for question id and answer id
+    fn get_qid(self: @T) -> u64;
+    fn get_ansid(self: @T) -> u64;
+    fn get_information(self: @T, question_maker: ContractAddress, qid: u64) -> (ContractAddress, u64, u256, bool);
 }
 #[starknet::contract]
 mod Escrow {
@@ -176,6 +179,18 @@ mod Escrow {
 
                 self.balances.write(qid, 0);
             }
+        }
+
+        fn get_qid(self: @ContractState) -> u64 {
+            self.question_id.read()
+        }
+
+        fn get_ansid(self: @ContractState) -> u64 {
+            self.answer_id.read()
+        }
+
+        fn get_information(self: @ContractState, question_maker: ContractAddress, qid: u64) -> (ContractAddress, u64, u256, bool) {
+            (self.approvals.read((question_maker, qid)), self.answers.read(qid), self.balances.read(qid), self.dispute_status.read(qid))
         }
     }
 }
