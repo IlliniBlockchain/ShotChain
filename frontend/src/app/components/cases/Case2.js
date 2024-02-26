@@ -75,28 +75,28 @@ const Case2 = ({ id, account }) => {
 
 
   return (
-    <div className="p-4">
-        <h2 className="text-2xl font-semibold mb-4">Applications</h2>
-        <ul className="space-y-4">
-          {comments.map((comment) => (
-            <li key={comment.id} className="bg-gray-100 p-4 rounded-lg flex">
-              <img src={comment.pfp} alt="profile" className="cursor-pointer w-10 h-10 rounded-full mr-4" onClick={() => onProfileClick(comment.address)}/>
-              <div>
-                <p className="font-semibold">{comment.name}</p>
-                <p>{comment.comment}</p>
-              </div>
-              <a href={comment.file} download>Download File</a>
-              <button
-        type="button"
-        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        onClick={() => updateQuestion(comment.address)}
-      >
-        Select User
-      </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="py-4 mb-32">
+      <h2 className="text-2xl font-semibold mb-4">Applications</h2>
+      <ul className="space-y-4">
+        {comments.map((comment) => (
+          <li key={comment.id} className="bg-gray-100 p-4 rounded-lg flex">
+            <img src={comment.pfp} alt="profile" className="cursor-pointer w-10 h-10 rounded-full mr-4" onClick={() => onProfileClick(comment.address)} />
+            <div>
+              <p className="font-semibold">{comment.name}</p>
+              <p>{comment.comment}</p>
+            </div>
+            <a href={comment.file} download>Download File</a>
+            <button
+              type="button"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              onClick={() => updateQuestion(comment.address)}
+            >
+              Select User
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
