@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 
+
 pub mod Errors {
     pub const APPROVAL_ISSUE: felt252 = 'question not approved!';
     pub const NOT_ANSWERED: felt252 = 'user did not answer!';
@@ -34,7 +35,7 @@ mod Escrow {
     
     // use openzeppelin::token::erc20::ERC20Component;
     // use openzeppelin::access::ownable::OwnableComponent;
-    use openzeppelin::token::erc20::interface::IERC20Dispatcher;
+    use openzeppelin::token::erc20::interface::{ IERC20Dispatcher, IERC20DispatcherTrait };
 
     // use openzeppelin::token::erc20::interface::IERC20CamelOnly;
     // use openzeppelin::token::erc20::interface::IERC20DispatcherTrait;
@@ -45,8 +46,8 @@ mod Escrow {
     use shot_chain::components::custom::component::CustomComponent;
 
     // component!(path: ERC20Component, storage: erc20, event: ERC20Event);
-    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: CustomComponent, storage: custom, event: CustomEvent);
+    // component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
+    // component!(path: CustomComponent, storage: custom, event: CustomEvent);
 
 
     #[storage]
@@ -60,24 +61,24 @@ mod Escrow {
         balances: LegacyMap::<u64, u256>, //qId -> balance
         dispute_status: LegacyMap::<u64, bool>, //qID -> isInDispute?
 
-        #[substorage(v0)]
-        erc20: ERC20Component::Storage,
-        #[substorage(v0)]
-        custom: CustomComponent::Storage,
-        #[substorage(v0)]
-        ownable: OwnableComponent::Storage,
+        // #[substorage(v0)]
+        // erc20: ERC20Component::Storage,
+        // #[substorage(v0)]
+        // custom: CustomComponent::Storage,
+        // #[substorage(v0)]
+        // ownable: OwnableComponent::Storage,
     }
 
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        #[flat]
-        ERC20Event: ERC20Component::Event,
-        #[flat]
-        CustomEvent: CustomComponent::Event,
-        #[flat]
-        OwnableEvent: OwnableComponent::Event,
-    }
+    // #[event]
+    // #[derive(Drop, starknet::Event)]
+    // enum Event {
+    //     #[flat]
+    //     ERC20Event: ERC20Component::Event,
+    //     #[flat]
+    //     CustomEvent: CustomComponent::Event,
+    //     #[flat]
+    //     OwnableEvent: OwnableComponent::Event,
+    // }
 
     #[constructor]
     fn constructor(ref self: ContractState, oracle: ContractAddress, mint: ContractAddress) {
@@ -99,7 +100,7 @@ mod Escrow {
             self.question_id.write(current_qid);
 
             
-            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(contract, bounty);
+            IERC20Dispatcher { contract_address: self.mint_addr.read()}.transfer(contract, bounty);
            
             // increment balances
         

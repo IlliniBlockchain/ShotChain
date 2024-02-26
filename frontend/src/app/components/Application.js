@@ -39,15 +39,16 @@ const Application = ({ id }) => {
   }, []);
   if (questionData != null) {
     if (account != questionData.address && questionData.selected == "" && questionData.comments.every(obj => obj.value !== account)) {//Case 1, be able to apply
-        ex = 1;
+      ex = 1;
     } else if (account != questionData.address && questionData.selected == "" && !questionData.comments.every(obj => obj.value !== account)) {
       ex = 8;
+      ex = 8;
     } else if (account == questionData.address && questionData.selected == "") { //Case 2, see current applications
-        ex = 2;
-     } else if (questionData.comments != null && questionData.answer.comment == "" && account == questionData.selected) {//Case 3, solve the question
-        ex = 3;
+      ex = 2;
+    } else if (questionData.comments != null && questionData.answer.comment == "" && account == questionData.selected) {//Case 3, solve the question
+      ex = 3;
     } else if (questionData.selected != "" && (account != questionData.selected && account != questionData.address)) { //Case 4, user got rejected
-        ex = 4;
+      ex = 4;
     } else if (questionData.done == false && questionData.answer.comment != "" && questionData.address == account) {
         ex = 5;
     } else if (questionData.done == false && questionData.answer.comment != "" && questionData.selected == account) {
@@ -75,7 +76,7 @@ const Application = ({ id }) => {
       case 6:
         return <Case6 id={id} account={account} />;
       case 7:
-        return <Case7 id={id} account={account}/>;
+        return <Case7 id={id} account={account} />;
       case 8:
         return <Case8/>;
       case 9:
