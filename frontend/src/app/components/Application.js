@@ -10,13 +10,14 @@ import Case5 from './cases/Case5';
 import Case6 from './cases/Case6';
 import Case0 from './cases/Case0';
 import Case7 from './cases/Case7';
+import Case8 from './cases/Case8';
 
-const Application = ({id}) => {
-const [questionData, setQuestionData] = useState(null);
-const [account, setAccount] = useState('');
-let ex = 0;
+const Application = ({ id }) => {
+  const [questionData, setQuestionData] = useState(null);
+  const [account, setAccount] = useState('');
+  let ex = 0;
 
-useEffect(() => {
+  useEffect(() => {
     const fetchQuestionData = async () => {
       try {
         const response = await fetch(`http://localhost:3001/questions/${id}`); // Adjust the URL/port as needed
@@ -35,51 +36,54 @@ useEffect(() => {
       setAccount(secureLocalStorage.getItem("key"))
     }
   }, []);
-  ex = 2;
-  // if (questionData != null) {
-  //   if (account != questionData.address && questionData.selected == "") {//Case 1, be able to apply
-  //       ex = 1;
-  //   } else if (account == questionData.address && questionData.selected == "") { //Case 2, see current applications
-  //       ex = 2;
-  //    } else if (questionData.comments != null && questionData.comments.comment == "" && account == questionData.selected) {//Case 3, solve the question
-  //       ex = 3;
-  //   } else if (questionData.selected != "" && account != questionData.selected) { //Case 4, user got rejected
-  //       ex = 4;
-  //   } else if (questionData.done == false && questionData.answer.comment != "" && questionData.account == account) {
-  //       ex = 5;
-  //   } else if (questionData.done == true && (questionData.address == account || questionData.address == account)) {
-  //       ex = 6;
-  //   } else if (questionData.done == false && questionData.address == account && questionData.selected != "") {
-  //     ex = 7;
-  //   }
-  // }
+  if (questionData != null) {
+    if (account != questionData.address && questionData.selected == "" && questionData.comments.every(obj => obj.value !== account)) {//Case 1, be able to apply
+        ex = 1;
+    } else if (account != questionData.address && questionData.selected == "" && !questionData.comments.every(obj => obj.value !== account)) {
+      ex = 8 ;
+    } else if (account == questionData.address && questionData.selected == "") { //Case 2, see current applications
+        ex = 2;
+     } else if (questionData.comments != null && questionData.answer.comment == "" && account == questionData.selected) {//Case 3, solve the question
+        ex = 3;
+    } else if (questionData.selected != "" && (account != questionData.selected && account != questionData.address)) { //Case 4, user got rejected
+        ex = 4;
+    } else if (questionData.done == false && questionData.answer.comment != "" && questionData.address == account) {
+        ex = 5;
+    } else if (questionData.done == true && (questionData.address == account || questionData.address == account)) {
+        ex = 6;
+    } else if (questionData.done == false && questionData.address == account && questionData.selected != "") {
+      ex = 7;
+    }
+  }
 
 
   const renderPage = () => {
     switch (ex) {
       case 1:
-        return <Case1 id={id} account={account}/>;
+        return <Case1 id={id} account={account} />;
       case 2:
-        return <Case2 id={id} account={account}/>;
+        return <Case2 id={id} account={account} />;
       case 3:
-        return <Case3 id={id} account={account}/>;
+        return <Case3 id={id} account={account} />;
       case 4:
-        return <Case4 id={id} account={account}/>;
+        return <Case4 id={id} account={account} />;
       case 5:
-        return <Case5 id={id} account={account}/>;
+        return <Case5 id={id} account={account} />;
       case 6:
-        return <Case6 id={id} account={account}/>;
+        return <Case6 id={id} account={account} />;
       case 7:
         return <Case7 id={id} account={account}/>;
+      case 8:
+        return <Case8/>;
       default:
-        return <Case0 id={id} account={account}/>;
+        return <Case0 id={id} account={account} />;
     }
   };
 
 
   return (
     <div>
-        {renderPage()}
+      {renderPage()}
     </div>
   )
 }

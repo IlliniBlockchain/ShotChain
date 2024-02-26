@@ -60,6 +60,7 @@ app.get('/questions', async (req, res) => {
       const items = await collection.find({})
                                      .sort({ date: -1 })
                                      .toArray();
+
       res.status(200).json(items);
     } catch (err) {
       console.error('Error fetching items:', err);
@@ -151,7 +152,6 @@ app.get('/questions/:id/comments', async (req, res) => {
 
 app.get('/profileQuestionsTrue/:user', async (req, res) => {
     const userId = req.params.user;
-  
     try {
       const collection = db.collection('Questions'); // Replace with your collection name
       const query = { address: userId, done: true };
@@ -165,7 +165,6 @@ app.get('/profileQuestionsTrue/:user', async (req, res) => {
 
   app.get('/profileQuestionsFalse/:user', async (req, res) => {
     const userId = req.params.user;
-  
     try {
       const collection = db.collection('Questions'); // Replace with your collection name
       const query = { address: userId, done: false };
@@ -178,11 +177,10 @@ app.get('/profileQuestionsTrue/:user', async (req, res) => {
   });
 
   app.get('/profileAnswersTrue/:user', async (req, res) => {
-    const { userId } = req.params.user;
-  
+    const userId = req.params.user;
     try {
       const collection = db.collection('Questions'); // Replace with your collection name
-      const query = { selected: userId, done: true }; // Note the use of dot notation for nested documents
+      const query = { selected: userId, done: true}; // Note the use of dot notation for nested documents
       const documents = await collection.find(query).toArray();
       res.json(documents);
     } catch (error) {
@@ -191,7 +189,7 @@ app.get('/profileQuestionsTrue/:user', async (req, res) => {
   });
 
   app.get('/profileAnswersFalse/:user', async (req, res) => {
-    const { userId } = req.params.user;
+    const userId = req.params.user;
   
     try {
       const collection = db.collection('Questions'); // Replace with your collection name
