@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import CommentSection from '@/app/components/Comment';
 import secureLocalStorage from 'react-secure-storage';
+import Application from '@/app/components/Application';
 
 const QuestionPage = () => {
     const [questionData, setQuestionData] = useState(null);
@@ -85,8 +86,8 @@ const QuestionPage = () => {
                 </div>
               </div>
             </article>
-            <CommentSection id={id}>
-            </CommentSection>
+            <Application id={id}>
+            </Application>
           </div>
         ) : (
           <p>Loading...</p>

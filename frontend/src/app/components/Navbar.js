@@ -135,6 +135,7 @@ export default function Navbar() {
                 imageURL: response.data.image,
                 rep: response.data.rep
               });
+              secureLocalStorage.setItem("key", response.data.address);
             }
           })
           .catch(error => {
@@ -184,7 +185,7 @@ export default function Navbar() {
     <Disclosure as="nav" className="sticky-nav bg-gray-800">
       {({ open }) => (
         <>
-          <div className="mx-6">
+          <div className="">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
@@ -223,19 +224,19 @@ export default function Navbar() {
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 text-white">
              { isConnected ? <button
         type="button"
-        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className="mr-8 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         onClick={disconnectWallet}
       >
         Disconnect Wallet
       </button> :<button
         type="button"
-        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className="mr-8 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         onClick={connectWallet}
       >
         Connect Wallet
       </button> }
-                <p>{account.name}</p>
-                <p>Rep: {account.rep}</p>
+                <p className='mr-8'>{account.name}</p>
+                <p className='mr-8'>🔥: {account.rep}</p>
                 
 
 

@@ -68,6 +68,7 @@ const Profile = () => {
     const [file, setFile] = useState(null); 
     const [userName, setUserName] = useState('');
     const [bio, setBio] = useState('');
+    const [rep, setRep] = useState(0);
 
 
     useEffect(() => {
@@ -92,6 +93,7 @@ const Profile = () => {
           setBio(response.data.bio);
           setFile(response.data.image)
           setUserName(response.data.name);
+          setRep(response.data.rep)
       })
       };
 
@@ -156,6 +158,9 @@ const Profile = () => {
                   />
                 </div>
               </div>
+              <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                🔥 (Rep): {rep}
+              </label>
             </div>
 
             <div className="col-span-full">

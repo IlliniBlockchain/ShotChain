@@ -24,8 +24,8 @@ html {
 
 .sticky-nav {
     width: calc(100vw - (100vw - 100%));
-    padding-left: 12rem;
-    padding-right: 12rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
 }
 
 .header {
@@ -85,5 +85,19 @@ html {
 .active {
     background-color: rgb(76, 76, 180);
     color: white !important;
+}
+
+.app-deadline {
+    background-color: rgb(76, 76, 180);
+    color: white !important;
+}
+
+.ans-deadline {
+    background-color: rgb(40, 141, 67);
+    color: white !important;
+}
+
+.bounty {
+    background-color: white;
 }
 
