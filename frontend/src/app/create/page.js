@@ -134,10 +134,16 @@ export default function Create() {
       axios.get(`http://localhost:3001/user/${account}`)
         .then(response => {
           formData.name = response.data.name;
-          formData.pfp = response.data.image;
-          formData.upVotes = []
-          formData.downVotes = []
-          formData.comments = []
+            formData.pfp = response.data.image;
+            formData.comments = [];
+            formData.selected = "";
+            formData.answer = {
+              comment: "",
+              file: "",
+            }
+            formData.isDisputed = false;
+            formData.expiry = "";
+            formData.done = false;
           try {
             axios.post('http://localhost:3001/questions', formData)
               .then(response => {
