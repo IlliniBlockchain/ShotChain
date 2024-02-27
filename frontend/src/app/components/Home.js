@@ -88,7 +88,7 @@ export default function Home() {
               <div className="space-y-20 lg:mt-16 lg:space-y-20">
                 {records.map((post) => (
                   <a href={`/question/${post._id}`}>
-                    <article key={post.id} className="background-question rounded-2xl my-8 relative isolate flex flex-col gap-8 lg:flex-row">
+                    <article key={post.id} className="background-question background-question-hover rounded-2xl my-8 relative isolate flex flex-col gap-8 lg:flex-row">
                       <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:aspect-square lg:w-64 lg:shrink-0">
                         <img
                           src={post.image}
@@ -105,7 +105,7 @@ export default function Home() {
                           <div
                             className="text-gray-500 relative z-10 rounded-full bounty px-3 py-1.5 font-medium text-gray-600 flex flex-row"
                           >
-                            <img src="/strk.jpeg" height={10} width={15}></img>
+                            <img src="/ethereum.png" height={15} width={10}></img>
                             <p className="ml-2">
                               {post.bounty}
                             </p>

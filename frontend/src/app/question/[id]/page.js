@@ -57,7 +57,7 @@ const QuestionPage = () => {
                 <div
                   className="text-gray-500 relative z-10 rounded-full bounty px-3 py-1.5 font-medium text-gray-600 flex flex-row"
                 >
-                  <img src="/strk.jpeg" height={10} width={15}></img>
+                  <img src="/ethereum.png" height={15} width={10}></img>
                   <p className="ml-2">
                     {questionData.bounty}
                   </p>
