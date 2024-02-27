@@ -13,6 +13,7 @@ import Case7 from './cases/Case7';
 import Case8 from './cases/Case8';
 import Case9 from './cases/Case9';
 
+
 const Application = ({ id }) => {
   const [questionData, setQuestionData] = useState(null);
   const [account, setAccount] = useState('');

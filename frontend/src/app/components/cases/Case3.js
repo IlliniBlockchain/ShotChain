@@ -1,9 +1,17 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import AWS from "aws-sdk";
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Provider, Contract, Account, json } from 'starknet';
+import jsonData from '../../abis/abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
+
+
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
 
 const uploadFile = async (addFile) => {
   if (!addFile) {
@@ -45,6 +53,9 @@ const uploadFile = async (addFile) => {
 const Case3 = ({ id, account }) => {
   const [comment, setComment] = useState('')
   const [file, setFile] = useState(null);
+  const [starkAcnt, setStarkAcnt] = useState();
+  const [qid, setQid] = useState();
+  const [answerer, setAnswerer] = useState()
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -73,11 +84,27 @@ const Case3 = ({ id, account }) => {
       // Optionally, re-fetch comments or update local state to include the new comment
       setComment('');
       setFile(null);
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+      myTestContract.connect(starkAcnt);
+      await myTestContract.answer(qid, answerer).then(resp => {
+        console.log(resp);
+      });
       window.location.reload();
     } catch (error) {
       console.error("Failed to add comment", error);
     }
   };
+
+
+  useEffect(() => {
+    const fetchCommentsAndUsers = async () => {
+        await connect().then(resp => {
+          setStarkAcnt(resp.account);
+        })
+    }
+
+    fetchCommentsAndUsers();
+  }, []);
 
 
   const handleFileChange = (e) => {

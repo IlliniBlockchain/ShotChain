@@ -3,12 +3,22 @@ import React, { useState, useEffect } from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Provider, Contract, Account, json } from 'starknet';
+import jsonData from '../../abis/abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
+
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
 
 
 const Case5 = ({ id, account }) => {
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState("Good");
   const [answer, setAnswer] = useState("");
+  const [starkAcnt, setStarkAcnt] = useState();
+  const [qid, setQid] = useState();
+  const [answerer, setAnswerer] = useState()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +90,10 @@ const Case5 = ({ id, account }) => {
           // Update state with comments that now include user data
           setAnswer(commentF);
         });
+
+        await connect().then(resp => {
+          setStarkAcnt(resp.account);
+        })
       } catch (error) {
         console.error("Failed to fetch comments", error);
       }

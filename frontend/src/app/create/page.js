@@ -8,7 +8,19 @@ import secureLocalStorage from 'react-secure-storage';
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Provider, Contract, Account, json, SequencerProvider } from 'starknet';
+import jsonData from '../abis/abi.json'
+import ercJsonData from '../abis/erc20abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
 
+
+
+
+ // for testnet
+
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
+const erc20Address = process.env.NEXT_PUBLIC_ETHCONTRACT
 
 export default function Create() {
   const [title, setTitle] = useState('');
@@ -18,6 +30,7 @@ export default function Create() {
   const [answerDeadline, setAnswerDeadline] = useState("");
   const [account, setAccount] = useState('');
   const [file, setFile] = useState(null);
+  const [starkAcnt, setStarkAcnt] = useState();
 
   const [qLength, setQLength] = useState(0)
 
@@ -26,6 +39,9 @@ export default function Create() {
     const loadQuestions = async () => {
       axios.get(`http://localhost:3001/questions`).then(response => {
         setQLength(response.data.length + 1)
+      })
+      await connect().then(resp => {
+        setStarkAcnt(resp.account);
       })
     }
     loadQuestions().catch(console.error)
@@ -70,7 +86,6 @@ export default function Create() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-
     if (bounty <= 0) return;
     if (appDeadline <= 0) return;
     if (answerDeadline <= 0) return;
@@ -155,10 +170,6 @@ export default function Create() {
                   icon: "success"
                 });
                 window.location.reload();
-                setTitle('');
-                setDescription('');
-                setBounty(0);
-                setFile(null);
               })
               .catch(error => {
                 console.error('Error creating user:', error);
@@ -168,7 +179,20 @@ export default function Create() {
           }
         })
     }
-
+    const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet
+    const erc20Contract = new Contract(ercJsonData, erc20Address, provider)
+    erc20Contract.connect(starkAcnt);
+    const tx = await erc20Contract.approve(process.env.NEXT_PUBLIC_CONTRACT, BigInt((bounty) * (10 ** 18)))
+    const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+    myTestContract.connect(starkAcnt);
+    await myTestContract.ask_question(BigInt(bounty * (10 ** 18))).then(resp => {
+      console.log(resp);
+    });
+    
+    setTitle('');
+    setDescription('');
+    setBounty(0);
+    setFile(null);
 
   };
 

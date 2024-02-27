@@ -2,9 +2,21 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Provider, Contract, Account, json } from 'starknet';
+import jsonData from '../../abis/abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
+
+
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+
+
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
 
 const Case2 = ({ id, account }) => {
   const [comments, setComments] = useState([]);
+  const [starkAcnt, setStarkAcnt] = useState();
+  const [qid, setQid] = useState();
 
   const updateQuestion = async (address) => {
     try {
@@ -15,6 +27,11 @@ const Case2 = ({ id, account }) => {
         title: "Good job!",
         text: "You have successfully picked your applicant!",
         icon: "success"
+      });
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+      myTestContract.connect(starkAcnt);
+      await myTestContract.assign(qid, address).then(resp => {
+        console.log(resp);
       });
       window.location.reload();
       return response.data;
@@ -63,7 +80,12 @@ const Case2 = ({ id, account }) => {
             commentsWithUserData.push(comment); // Adds the comment without user data
           }
         }
-
+        await connect().then(resp => {
+          setStarkAcnt(resp.account);
+        })
+        await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
+          setQid(resp.data.qid)
+        })
         // Update state with comments that now include user data
         setComments(commentsWithUserData);
       } catch (error) {

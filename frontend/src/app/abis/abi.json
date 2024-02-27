@@ -1,0 +1,199 @@
+[
+    {
+      "name": "EscrowImpl",
+      "type": "impl",
+      "interface_name": "shot_chain::contract::escrow::IEscrow"
+    },
+    {
+      "name": "core::integer::u256",
+      "type": "struct",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "name": "core::bool",
+      "type": "enum",
+      "variants": [
+        {
+          "name": "False",
+          "type": "()"
+        },
+        {
+          "name": "True",
+          "type": "()"
+        }
+      ]
+    },
+    {
+      "name": "shot_chain::contract::escrow::IEscrow",
+      "type": "interface",
+      "items": [
+        {
+          "name": "ask_question",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "bounty",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "assign",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "answerer",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "answer",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "question_maker",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "approve",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "question_answerer",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "deny",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "question_answerer",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "arbiter",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "question_maker",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "decision",
+              "type": "core::bool"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_qid",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "get_ansid",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u64"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "get_information",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "question_maker",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "qid",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "(core::starknet::contract_address::ContractAddress, core::integer::u64, core::integer::u256, core::bool)"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "name": "constructor",
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "oracle",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "mint",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "shot_chain::contract::escrow::Escrow::Event",
+      "type": "event",
+      "variants": []
+    }
+  ]
