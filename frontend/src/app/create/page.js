@@ -119,6 +119,8 @@ export default function Create() {
                   setAppDeadline(0);
                   setAnswerDeadline(0);
                   setFile(null);
+
+                  window.location.reload();
                 })
                 .catch(error => {
                   console.error('Error creating user:', error);
@@ -134,16 +136,16 @@ export default function Create() {
       axios.get(`http://localhost:3001/user/${account}`)
         .then(response => {
           formData.name = response.data.name;
-            formData.pfp = response.data.image;
-            formData.comments = [];
-            formData.selected = "";
-            formData.answer = {
-              comment: "",
-              file: "",
-            }
-            formData.isDisputed = false;
-            formData.expiry = "";
-            formData.done = false;
+          formData.pfp = response.data.image;
+          formData.comments = [];
+          formData.selected = "";
+          formData.answer = {
+            comment: "",
+            file: "",
+          }
+          formData.isDisputed = false;
+          formData.expiry = "";
+          formData.done = false;
           try {
             axios.post('http://localhost:3001/questions', formData)
               .then(response => {
@@ -154,7 +156,7 @@ export default function Create() {
                   text: "Your question has been successfully posted!",
                   icon: "success"
                 });
-                window.location.reload();
+
                 setTitle('');
                 setDescription('');
                 setBounty(0);
@@ -181,107 +183,107 @@ export default function Create() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-12 sm:space-y-16 ml-8">
+      <div className="">
         <div>
-          <h2 className="text-base font-semibold leading-7 text-gray-900 mt-8">Add Question</h2>
-          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
+          <div class="about flex flex-col mx-48 pt-32 pb-16 lg:max-w-6xl">
+            <h2 id="" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Create a Question</h2>
+            <p className="mt-2 text-lg leading-8 text-gray-600 sm:text-2xl">
+              Need expert advise? Define your question and place a bounty!
+            </p>
+          </div>
+          <div className="mx-48 lg:max-w-6xl border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t">
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Title
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    placeholder="Title"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  placeholder="Title"
+                  className="block w-full rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </div>
             </div>
 
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="about" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="about" className="block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Description
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
                 <textarea
                   type="text"
                   id="description"
                   name="description"
                   rows={3}
                   placeholder="Description"
-                  className="block w-full px-1.5 max-w-2xl rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Bounty (STRK)
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Bounty (ETH)
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={bounty}
-                    onChange={(e) => setBounty(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Deadline for Applications (Days)
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={appDeadline}
-                    onChange={(e) => setAppDeadline(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Answer Timeframe (Days)
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={answerDeadline}
-                    onChange={(e) => setAnswerDeadline(e.target.value)}
-                  />
-                </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="bounty"
+                  id="bounty"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={bounty}
+                  onChange={(e) => setBounty(e.target.value)}
+                />
               </div>
             </div>
 
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Deadline for Application (Days)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="appDeadline"
+                  id="appDeadline"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={appDeadline}
+                  onChange={(e) => setAppDeadline(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Answer Timeframe (Days)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="answerDeadline"
+                  id="answerDeadline"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={answerDeadline}
+                  onChange={(e) => setAnswerDeadline(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="cover-photo" className="block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Photo
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex max-w-2xl justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <div className="flex w-full justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                   <div className="text-center">
                     <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
                     <div className="mt-4 flex text-sm leading-6 text-gray-600">
@@ -304,14 +306,14 @@ export default function Create() {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6 mr-8">
+      <div className="mt-6 flex items-center justify-end gap-x-6  mr-48 mb-24">
         <button
           type="submit"
           className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Post
+          Submit Question
         </button>
       </div>
-    </form>
+    </form >
   )
 }

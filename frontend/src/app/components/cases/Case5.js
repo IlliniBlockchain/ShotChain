@@ -93,16 +93,16 @@ const Case5 = ({ id, account }) => {
 
   return (
     <div className="mb-32">
-      <div className="py-4">
+      <div className="py-4 mb-32">
         <h2 className="text-2xl font-semibold mb-4">Final Answer</h2>
         <ul className="space-y-4">
           <li key={answer.id} className="bg-gray-100 p-4 rounded-lg flex">
             <img src={answer.pfp} alt="profile" className="w-10 h-10 rounded-full mr-4" />
             <div>
-              <p className="font-semibold">{answer.name}</p>
-              <p>{answer.comment}</p>
+              <p className="font-semibold mb-2">{answer.name}</p>
+              <p className="mb-2">{answer.comment}</p>
+              <a className="download" href={answer.file} download><u>Download File</u></a>
             </div>
-            <a href={answer.file} download>Download File</a>
           </li>
         </ul>
       </div>

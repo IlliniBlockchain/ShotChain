@@ -24,8 +24,7 @@ html {
 
 .sticky-nav {
     width: calc(100vw - (100vw - 100%));
-    padding-left: 4rem;
-    padding-right: 4rem;
+    background-color: #eeeeee;
 }
 
 .header {
@@ -40,6 +39,10 @@ html {
 
 .background-question {
     background-color: #eeeeee;
+}
+
+.background-question-hover:hover {
+    filter: brightness(0.98);
 }
 
 .header__title{
@@ -92,6 +95,11 @@ html {
     color: white !important;
 }
 
+.q-finished {
+    background-color: rgb(202, 133, 29);
+    color: white !important;
+}
+
 .ans-deadline {
     background-color: rgb(40, 141, 67);
     color: white !important;
@@ -119,3 +127,18 @@ html {
 .download:hover {
     color: rgb(38, 141, 209);
 }
+
+.application {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.application div {
+    flex-basis: 60vw;
+}
+
+.pfp-hover:hover {
+    filter: brightness(0.9);
+}
+
