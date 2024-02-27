@@ -8,7 +8,19 @@ import secureLocalStorage from 'react-secure-storage';
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Provider, Contract, Account, json, SequencerProvider } from 'starknet';
+import jsonData from '../abis/abi.json'
+import ercJsonData from '../abis/erc20abi.json'
+import { constants, RpcProvider } from 'starknet';
+import { connect, disconnect } from "get-starknet"
 
+
+
+
+ // for testnet
+
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
+const erc20Address = process.env.NEXT_PUBLIC_ETHCONTRACT
 
 export default function Create() {
   const [title, setTitle] = useState('');
@@ -18,6 +30,7 @@ export default function Create() {
   const [answerDeadline, setAnswerDeadline] = useState("");
   const [account, setAccount] = useState('');
   const [file, setFile] = useState(null);
+  const [starkAcnt, setStarkAcnt] = useState();
 
   const [qLength, setQLength] = useState(0)
 
@@ -26,6 +39,9 @@ export default function Create() {
     const loadQuestions = async () => {
       axios.get(`http://localhost:3001/questions`).then(response => {
         setQLength(response.data.length + 1)
+      })
+      await connect().then(resp => {
+        setStarkAcnt(resp.account);
       })
     }
     loadQuestions().catch(console.error)
@@ -70,7 +86,6 @@ export default function Create() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-
     if (bounty <= 0) return;
     if (appDeadline <= 0) return;
     if (answerDeadline <= 0) return;
@@ -82,9 +97,12 @@ export default function Create() {
     formData.bounty = bounty;
     formData.answerDeadline = answerDeadline;
     formData.appDeadline = appDeadline;
-    formData.qid = qLength;
-    console.log(qLength)
-
+    const provider = new RpcProvider({
+      nodeUrl: 'https://starknet-goerli.infura.io/v3/a6f468d4cc434e2e8a324fc56dc4e860',
+    });
+    const qidContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+    const qid = await qidContract.get_qid();
+    formData.qid = Number(qid) + 1;
     if (file) {
       await uploadFile(file).then(result => {
         formData.image = 'https://shotchain.s3.amazonaws.com/' + file.name;
@@ -107,18 +125,15 @@ export default function Create() {
               axios.post('http://localhost:3001/questions', formData)
                 .then(response => {
                   console.log('User created:', response.data);
+                  ID = response.data.insertedId;
                   // Optionally, clear the form or give user feedback
-                  Swal.fire({
-                    title: "Congrats",
-                    text: "Your question has been successfully posted!",
-                    icon: "success"
-                  });
                   setTitle('');
                   setDescription('');
                   setBounty(0);
                   setAppDeadline(0);
                   setAnswerDeadline(0);
                   setFile(null);
+
                 })
                 .catch(error => {
                   console.error('Error creating user:', error);
@@ -134,30 +149,27 @@ export default function Create() {
       axios.get(`http://localhost:3001/user/${account}`)
         .then(response => {
           formData.name = response.data.name;
-            formData.pfp = response.data.image;
-            formData.comments = [];
-            formData.selected = "";
-            formData.answer = {
-              comment: "",
-              file: "",
-            }
-            formData.isDisputed = false;
-            formData.expiry = "";
-            formData.done = false;
+          formData.pfp = response.data.image;
+          formData.comments = [];
+          formData.selected = "";
+          formData.answer = {
+            comment: "",
+            file: "",
+          }
+          formData.isDisputed = false;
+          formData.expiry = "";
+          formData.done = false;
           try {
             axios.post('http://localhost:3001/questions', formData)
               .then(response => {
                 console.log('User created:', response.data);
+                ID = response.data.insertedId;
                 // Optionally, clear the form or give user feedback
                 Swal.fire({
                   title: "Congrats",
                   text: "Your question has been successfully posted!",
                   icon: "success"
                 });
-                setTitle('');
-                setDescription('');
-                setBounty(0);
-                setFile(null);
               })
               .catch(error => {
                 console.error('Error creating user:', error);
@@ -167,7 +179,26 @@ export default function Create() {
           }
         })
     }
-
+    const erc20Contract = new Contract(ercJsonData, erc20Address, provider)
+    erc20Contract.connect(starkAcnt);
+    const tx = await erc20Contract.approve(process.env.NEXT_PUBLIC_CONTRACT, BigInt((bounty) * (10 ** 18)))
+    await provider.waitForTransaction(tx.transaction_hash);
+    const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+    myTestContract.connect(starkAcnt);
+    await myTestContract.ask_question(BigInt(bounty * (10 ** 18))).then(resp => {
+      console.log(resp);
+    });
+    setTitle('');
+    setDescription('');
+    setBounty(0);
+    setAppDeadline(0);
+    setAnswerDeadline(0);
+    setFile(null);
+    Swal.fire({
+      title: "Congrats",
+      text: "Your question has been successfully posted!",
+      icon: "success"
+    });
 
   };
 
@@ -180,107 +211,107 @@ export default function Create() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-12 sm:space-y-16 ml-8">
+      <div className="">
         <div>
-          <h2 className="text-base font-semibold leading-7 text-gray-900 mt-8">Add Question</h2>
-          <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
+          <div class="about flex flex-col mx-48 pt-32 pb-16 lg:max-w-6xl">
+            <h2 id="" className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">Create a Question</h2>
+            <p className="mt-2 text-lg leading-8 text-gray-600 sm:text-2xl">
+              Need expert advise? Define your question and place a bounty!
+            </p>
+          </div>
+          <div className="mx-48 lg:max-w-6xl border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t">
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Title
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    placeholder="Title"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  placeholder="Title"
+                  className="block w-full rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </div>
             </div>
 
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="about" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="about" className="block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Description
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
                 <textarea
                   type="text"
                   id="description"
                   name="description"
                   rows={3}
                   placeholder="Description"
-                  className="block w-full px-1.5 max-w-2xl rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Bounty (STRK)
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Bounty (ETH)
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={bounty}
-                    onChange={(e) => setBounty(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Deadline for Applications (Days)
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={appDeadline}
-                    onChange={(e) => setAppDeadline(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:py-6">
-              <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                Answer Timeframe (Days)
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="number"
-                    name="bounty"
-                    id="bounty"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    value={answerDeadline}
-                    onChange={(e) => setAnswerDeadline(e.target.value)}
-                  />
-                </div>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="bounty"
+                  id="bounty"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={bounty}
+                  onChange={(e) => setBounty(e.target.value)}
+                />
               </div>
             </div>
 
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Deadline for Application (Days)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="appDeadline"
+                  id="appDeadline"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={appDeadline}
+                  onChange={(e) => setAppDeadline(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="username" className="w-full block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
+                Answer Timeframe (Days)
+              </label>
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <input
+                  type="text"
+                  name="answerDeadline"
+                  id="answerDeadline"
+                  placeholder="0"
+                  className="block rounded-md border-0 py-1.5 pl-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset sm:text-sm sm:leading-6"
+                  value={answerDeadline}
+                  onChange={(e) => setAnswerDeadline(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <label htmlFor="cover-photo" className="block text-lg font-medium leading-6 text-gray-900 sm:pt-1.5">
                 Photo
               </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex max-w-2xl justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+              <div className="mt-2 sm:col-span-2 sm:mt-0 ml-32">
+                <div className="flex w-full justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                   <div className="text-center">
                     <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
                     <div className="mt-4 flex text-sm leading-6 text-gray-600">
@@ -303,14 +334,14 @@ export default function Create() {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6 mr-8">
+      <div className="mt-6 flex items-center justify-end gap-x-6  mr-48 mb-24">
         <button
           type="submit"
           className="inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Post
+          Submit Question
         </button>
       </div>
-    </form>
+    </form >
   )
 }

@@ -1,9 +1,17 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import AWS from "aws-sdk";
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Provider, Contract, Account, json } from 'starknet';
+import jsonData from '../../abis/abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
+
+
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
 
 const uploadFile = async (addFile) => {
   if (!addFile) {
@@ -45,6 +53,9 @@ const uploadFile = async (addFile) => {
 const Case3 = ({ id, account }) => {
   const [comment, setComment] = useState('')
   const [file, setFile] = useState(null);
+  const [starkAcnt, setStarkAcnt] = useState();
+  const [qid, setQid] = useState();
+  const [answerer, setAnswerer] = useState()
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -71,12 +82,33 @@ const Case3 = ({ id, account }) => {
         icon: "success"
       });
       // Optionally, re-fetch comments or update local state to include the new comment
+      console.log("eafewf")
       setComment('');
       setFile(null);
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+      myTestContract.connect(starkAcnt);
+      await myTestContract.answer(qid, answerer).then(resp => {
+        console.log(resp);
+      });
     } catch (error) {
       console.error("Failed to add comment", error);
     }
   };
+
+
+  useEffect(() => {
+    const fetchCommentsAndUsers = async () => {
+        await connect().then(resp => {
+          setStarkAcnt(resp.account);
+        })
+        await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
+          setAnswerer(resp.data.address)
+          setQid(resp.data.qid);
+        })
+    }
+
+    fetchCommentsAndUsers();
+  }, []);
 
 
   const handleFileChange = (e) => {
@@ -88,7 +120,7 @@ const Case3 = ({ id, account }) => {
     <form onSubmit={handleAddComment} className="mb-32">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Answer Submission</h2>
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Congrats! You have been selected to answer this question</h2>
           <p className="mt-1 text-sm leading-6 text-gray-600">
             Please answer the poster's question with as much detail as possible
           </p>
@@ -105,7 +137,7 @@ const Case3 = ({ id, account }) => {
                   placeholder="Your comment"
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   value={comment}
                 />
               </div>
@@ -130,6 +162,7 @@ const Case3 = ({ id, account }) => {
                     <p className="pl-1">or drag and drop</p>
                   </div>
                   <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs leading-5 text-gray-600">Selected File: {file != null ? file.name : "None"}</p>
                 </div>
               </div>
             </div>

@@ -3,27 +3,38 @@ import React, { useState, useEffect } from 'react'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Provider, Contract, Account, json } from 'starknet';
+import jsonData from '../../abis/abi.json'
+import { constants } from 'starknet';
+import { connect, disconnect } from "get-starknet"
+
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const testAddress = process.env.NEXT_PUBLIC_CONTRACT;
 
 
 const Case5 = ({ id, account }) => {
   const [feedback, setFeedback] = useState('');
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState("Good");
   const [answer, setAnswer] = useState("");
+  const [starkAcnt, setStarkAcnt] = useState();
+  const [qid, setQid] = useState();
+  const [answerer, setAnswerer] = useState()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.patch(`http://localhost:3001/questions/${id}`, {
-      feedback: {
-        feedback: feedback,
-        rating: rating // This will be an empty string if there's no file, which is fine
-      },
-      done: true,
-    });
-
+    console.log(rating)
     if (rating == "Good") {
       // Fetch the current user's data to get the rep score
       const userResponse = await axios.get(`http://localhost:3001/user/${answer.address}`);
       const currentUserData = userResponse.data;
+
+        await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        done: true,
+      });
 
       // Update the user's rep score by adding 20
       if (currentUserData && currentUserData.rep !== undefined) {
@@ -33,12 +44,45 @@ const Case5 = ({ id, account }) => {
         await axios.patch(`http://localhost:3001/users/${answer.address}`, {
           rep: updatedRep
         });
+
+       
+
+        const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.approve(qid, answerer).then(resp => {
+          console.log(resp);
+        });
       }
+    }
+    if (rating == "Indifferent") {
+
+      await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        done: true,
+      });
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.approve(qid, answerer).then(resp => {
+          console.log(resp);
+        });
+
     }
     if (rating == "Bad") {
       // Fetch the current user's data to get the rep score
       const userResponse = await axios.get(`http://localhost:3001/user/${answer.address}`);
       const currentUserData = userResponse.data;
+
+      await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        dispute: true,
+        done: true
+      });
 
       // Update the user's rep score by adding 20
       if (currentUserData && currentUserData.rep !== undefined) {
@@ -49,16 +93,20 @@ const Case5 = ({ id, account }) => {
           rep: updatedRep
         });
       }
+
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.deny(qid, answerer).then(resp => {
+          console.log(resp);
+      });
     }
     Swal.fire({
       title: "Good job!",
       text: "Your feedback has been submitted",
       icon: "success"
     });
+    window.location.reload();
     setFeedback('');
-
-
-
   };
 
   useEffect(() => {
@@ -82,6 +130,14 @@ const Case5 = ({ id, account }) => {
           // Update state with comments that now include user data
           setAnswer(commentF);
         });
+
+        await connect().then(resp => {
+          setStarkAcnt(resp.account);
+        })
+        await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
+          setAnswerer(resp.data.selected)
+          setQid(resp.data.qid);
+        })
       } catch (error) {
         console.error("Failed to fetch comments", error);
       }
@@ -95,16 +151,16 @@ const Case5 = ({ id, account }) => {
 
   return (
     <div className="mb-32">
-      <div className="py-4">
+      <div className="py-4 mb-32">
         <h2 className="text-2xl font-semibold mb-4">Final Answer</h2>
         <ul className="space-y-4">
           <li key={answer.id} className="bg-gray-100 p-4 rounded-lg flex">
             <img src={answer.pfp} alt="profile" className="w-10 h-10 rounded-full mr-4" />
             <div>
-              <p className="font-semibold">{answer.name}</p>
-              <p>{answer.comment}</p>
+              <p className="font-semibold mb-2">{answer.name}</p>
+              <p className="mb-2">{answer.comment}</p>
+              <a className="download" href={answer.file} download><u>Download File</u></a>
             </div>
-            <a href={answer.file} download>Download File</a>
           </li>
         </ul>
       </div>
