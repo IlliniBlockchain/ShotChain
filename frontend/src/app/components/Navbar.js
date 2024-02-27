@@ -182,7 +182,7 @@ export default function Navbar() {
 
 
   return (
-    <Disclosure as="nav" className="sticky-nav px-48">
+    <Disclosure as="nav" className="sticky-nav px-28">
       {({ open }) => (
         <>
           <div className="">
@@ -200,7 +200,7 @@ export default function Navbar() {
                 </Disclosure.Button>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="app-deadline flex flex-shrink-0 items-center text-white rounded-md px-3 py-2">
+                <div className="nav-logo flex flex-shrink-0 items-center text-white rounded-md px-3 py-2">
                   Shotchain
                 </div>
                 <div className="hidden sm:ml-6 sm:block">

@@ -52,7 +52,7 @@ const Case5 = ({ id, account }) => {
         await myTestContract.approve(qid, answerer).then(resp => {
           console.log(resp);
         });
-        }
+      }
     }
     if (rating == "Indifferent") {
 

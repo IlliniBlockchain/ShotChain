@@ -82,6 +82,7 @@ const Case3 = ({ id, account }) => {
         icon: "success"
       });
       // Optionally, re-fetch comments or update local state to include the new comment
+      console.log("eafewf")
       setComment('');
       setFile(null);
       const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
@@ -136,7 +137,7 @@ const Case3 = ({ id, account }) => {
                   placeholder="Your comment"
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   value={comment}
                 />
               </div>
@@ -161,6 +162,7 @@ const Case3 = ({ id, account }) => {
                     <p className="pl-1">or drag and drop</p>
                   </div>
                   <p className="text-xs leading-5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs leading-5 text-gray-600">Selected File: {file != null ? file.name : "None"}</p>
                 </div>
               </div>
             </div>

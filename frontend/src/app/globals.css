@@ -95,6 +95,11 @@ html {
     color: white !important;
 }
 
+.nav-logo {
+    background: linear-gradient(to right, rgba(107, 22, 197, 1),rgba(204, 63, 178, 1));
+    font-weight:bold;
+}
+
 .q-finished {
     background-color: rgb(202, 133, 29);
     color: white !important;

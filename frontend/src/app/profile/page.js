@@ -87,6 +87,7 @@ const Profile = () => {
           const currentDate = new Date();
           return newDate > currentDate;
         });
+        console.log(filteredData)
         setActiveQuestions(filteredData)
       })
 
@@ -376,7 +377,7 @@ const Profile = () => {
         </div>
 
         <div className="space-y-4">
-          {(selA == "Active Answers" ? activeAnswers : pastAnswers).map((post) => (
+          {(selA == "Active Answers" ? activeAnswers : pastAnswers).slice().reverse().map((post) => (
             <div>
               <a href={`/question/${post._id}`}>
                 <article key={post.id} className="background-question background-question-hover rounded-2xl my-8 relative isolate flex flex-col gap-8 lg:flex-row">
@@ -402,7 +403,7 @@ const Profile = () => {
                         </p>
                       </div>
                       <time dateTime={post.datetime} className={`text-gray-500 relative z-10 rounded-full ${selQ === "Active Answers" ? "app-deadline" : "q-finished"} px-3 py-1.5 font-medium text-gray-600 flex flex-row`}>
-                        {selQ === "Active Answers" ? formatAppDeadline(post.date, post.appDeadline) : "Past Answers"}
+                        {selQ === "Active Answers" ? formatAppDeadline(post.date, post.appDeadline) : "You Answered"}
                       </time>
                       <time dateTime={post.datetime} className="text-gray-500 relative z-10 rounded-full ans-deadline px-3 py-1.5 font-medium text-gray-600 flex flex-row">
                         {formatAnsDeadline(post.answerDeadline)}
@@ -434,18 +435,6 @@ const Profile = () => {
                   </div>
                 </article>
               </a>
-              {selA == "Past Answers" ?
-                <ul className="space-y-4">
-                  <li key={post.answer.id} className="bg-gray-100 p-4 rounded-lg flex">
-                    <img src={userData.image} alt="profile" className="w-10 h-10 rounded-full mr-4" />
-                    <div>
-                      <p className="font-semibold">{userData.name}</p>
-                      <p>{post.answer.comment}</p>
-                    </div>
-                    <a href={post.answer.file} download>Download File</a>
-                  </li>
-                </ul> : <div></div>
-              }
             </div>
           ))}
         </div>
