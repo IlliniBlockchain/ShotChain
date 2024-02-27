@@ -22,18 +22,19 @@ const Case5 = ({ id, account }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.patch(`http://localhost:3001/questions/${id}`, {
-      feedback: {
-        feedback: feedback,
-        rating: rating // This will be an empty string if there's no file, which is fine
-      },
-      done: true,
-    });
     console.log(rating)
     if (rating == "Good") {
       // Fetch the current user's data to get the rep score
       const userResponse = await axios.get(`http://localhost:3001/user/${answer.address}`);
       const currentUserData = userResponse.data;
+
+        await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        done: true,
+      });
 
       // Update the user's rep score by adding 20
       if (currentUserData && currentUserData.rep !== undefined) {
@@ -44,17 +45,45 @@ const Case5 = ({ id, account }) => {
           rep: updatedRep
         });
 
+       
+
         const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
         myTestContract.connect(starkAcnt);
-        await myTestContract.approve(10, answerer).then(resp => {
+        await myTestContract.approve(qid, answerer).then(resp => {
           console.log(resp);
         });
         }
+    }
+    if (rating == "Indifferent") {
+
+      await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        dispute: true,
+        done: true,
+      });
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.approve(qid, answerer).then(resp => {
+          console.log(resp);
+        });
+
     }
     if (rating == "Bad") {
       // Fetch the current user's data to get the rep score
       const userResponse = await axios.get(`http://localhost:3001/user/${answer.address}`);
       const currentUserData = userResponse.data;
+
+      await axios.patch(`http://localhost:3001/questions/${id}`, {
+        feedback: {
+          feedback: feedback,
+          rating: rating // This will be an empty string if there's no file, which is fine
+        },
+        dispute: true,
+        done: true
+      });
 
       // Update the user's rep score by adding 20
       if (currentUserData && currentUserData.rep !== undefined) {
@@ -102,6 +131,7 @@ const Case5 = ({ id, account }) => {
         })
         await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
           setAnswerer(resp.data.selected)
+          setQid(resp.data.qid);
         })
       } catch (error) {
         console.error("Failed to fetch comments", error);

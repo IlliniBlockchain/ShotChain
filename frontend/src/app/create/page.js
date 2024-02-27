@@ -97,9 +97,12 @@ export default function Create() {
     formData.bounty = bounty;
     formData.answerDeadline = answerDeadline;
     formData.appDeadline = appDeadline;
-    formData.qid = qLength;
-    console.log(qLength)
-    let ID;
+    const provider = new RpcProvider({
+      nodeUrl: 'https://starknet-goerli.infura.io/v3/a6f468d4cc434e2e8a324fc56dc4e860',
+    });
+    const qidContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+    const qid = await qidContract.get_qid();
+    formData.qid = Number(qid) + 1;
     if (file) {
       await uploadFile(file).then(result => {
         formData.image = 'https://shotchain.s3.amazonaws.com/' + file.name;
@@ -124,11 +127,6 @@ export default function Create() {
                   console.log('User created:', response.data);
                   ID = response.data.insertedId;
                   // Optionally, clear the form or give user feedback
-                  Swal.fire({
-                    title: "Congrats",
-                    text: "Your question has been successfully posted!",
-                    icon: "success"
-                  });
                   setTitle('');
                   setDescription('');
                   setBounty(0);
@@ -136,7 +134,6 @@ export default function Create() {
                   setAnswerDeadline(0);
                   setFile(null);
 
-                  window.location.reload();
                 })
                 .catch(error => {
                   console.error('Error creating user:', error);
@@ -173,7 +170,6 @@ export default function Create() {
                   text: "Your question has been successfully posted!",
                   icon: "success"
                 });
-                window.location.reload();
               })
               .catch(error => {
                 console.error('Error creating user:', error);
@@ -183,9 +179,6 @@ export default function Create() {
           }
         })
     }
-    const provider = new RpcProvider({
-      nodeUrl: 'https://starknet-goerli.infura.io/v3/a6f468d4cc434e2e8a324fc56dc4e860',
-    });
     const erc20Contract = new Contract(ercJsonData, erc20Address, provider)
     erc20Contract.connect(starkAcnt);
     const tx = await erc20Contract.approve(process.env.NEXT_PUBLIC_CONTRACT, BigInt((bounty) * (10 ** 18)))
@@ -195,17 +188,17 @@ export default function Create() {
     await myTestContract.ask_question(BigInt(bounty * (10 ** 18))).then(resp => {
       console.log(resp);
     });
-
-    // await myTestContract.get_qid().then(resp => {
-    //   console.log(resp)
-    // });
-
-    // await axios.patch(`http://localhost:3001/questions/${ID}`, {qidd: qid});
-    
     setTitle('');
     setDescription('');
     setBounty(0);
+    setAppDeadline(0);
+    setAnswerDeadline(0);
     setFile(null);
+    Swal.fire({
+      title: "Congrats",
+      text: "Your question has been successfully posted!",
+      icon: "success"
+    });
 
   };
 

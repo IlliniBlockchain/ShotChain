@@ -86,10 +86,9 @@ const Case3 = ({ id, account }) => {
       setFile(null);
       const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
       myTestContract.connect(starkAcnt);
-      await myTestContract.answer(10, answerer).then(resp => {
+      await myTestContract.answer(qid, answerer).then(resp => {
         console.log(resp);
       });
-      window.location.reload();
     } catch (error) {
       console.error("Failed to add comment", error);
     }
@@ -103,6 +102,7 @@ const Case3 = ({ id, account }) => {
         })
         await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
           setAnswerer(resp.data.address)
+          setQid(resp.data.qid);
         })
     }
 
