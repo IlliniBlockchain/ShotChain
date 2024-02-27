@@ -11,7 +11,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Provider, Contract, Account, json, SequencerProvider } from 'starknet';
 import jsonData from '../abis/abi.json'
 import ercJsonData from '../abis/erc20abi.json'
-import { constants } from 'starknet';
+import { constants, RpcProvider } from 'starknet';
 import { connect, disconnect } from "get-starknet"
 
 
@@ -99,7 +99,7 @@ export default function Create() {
     formData.appDeadline = appDeadline;
     formData.qid = qLength;
     console.log(qLength)
-
+    let ID;
     if (file) {
       await uploadFile(file).then(result => {
         formData.image = 'https://shotchain.s3.amazonaws.com/' + file.name;
@@ -122,6 +122,7 @@ export default function Create() {
               axios.post('http://localhost:3001/questions', formData)
                 .then(response => {
                   console.log('User created:', response.data);
+                  ID = response.data.insertedId;
                   // Optionally, clear the form or give user feedback
                   Swal.fire({
                     title: "Congrats",
@@ -163,6 +164,7 @@ export default function Create() {
             axios.post('http://localhost:3001/questions', formData)
               .then(response => {
                 console.log('User created:', response.data);
+                ID = response.data.insertedId;
                 // Optionally, clear the form or give user feedback
                 Swal.fire({
                   title: "Congrats",
@@ -179,15 +181,24 @@ export default function Create() {
           }
         })
     }
-    const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet
+    const provider = new RpcProvider({
+      nodeUrl: 'https://starknet-goerli.infura.io/v3/a6f468d4cc434e2e8a324fc56dc4e860',
+    });
     const erc20Contract = new Contract(ercJsonData, erc20Address, provider)
     erc20Contract.connect(starkAcnt);
     const tx = await erc20Contract.approve(process.env.NEXT_PUBLIC_CONTRACT, BigInt((bounty) * (10 ** 18)))
+    await provider.waitForTransaction(tx.transaction_hash);
     const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
     myTestContract.connect(starkAcnt);
     await myTestContract.ask_question(BigInt(bounty * (10 ** 18))).then(resp => {
       console.log(resp);
     });
+
+    // await myTestContract.get_qid().then(resp => {
+    //   console.log(resp)
+    // });
+
+    // await axios.patch(`http://localhost:3001/questions/${ID}`, {qidd: qid});
     
     setTitle('');
     setDescription('');

@@ -30,7 +30,7 @@ const Case2 = ({ id, account }) => {
       });
       const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
       myTestContract.connect(starkAcnt);
-      await myTestContract.assign(qid, address).then(resp => {
+      await myTestContract.assign(10, address).then(resp => {
         console.log(resp);
       });
       window.location.reload();

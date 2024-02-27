@@ -43,7 +43,13 @@ const Case5 = ({ id, account }) => {
         await axios.patch(`http://localhost:3001/users/${answer.address}`, {
           rep: updatedRep
         });
-      }
+
+        const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.approve(10, answerer).then(resp => {
+          console.log(resp);
+        });
+        }
     }
     if (rating == "Bad") {
       // Fetch the current user's data to get the rep score
@@ -93,6 +99,9 @@ const Case5 = ({ id, account }) => {
 
         await connect().then(resp => {
           setStarkAcnt(resp.account);
+        })
+        await axios.get(`http://localhost:3001/questions/${id}`).then(resp => {
+          setAnswerer(resp.data.selected)
         })
       } catch (error) {
         console.error("Failed to fetch comments", error);
