@@ -61,7 +61,6 @@ const Case5 = ({ id, account }) => {
           feedback: feedback,
           rating: rating // This will be an empty string if there's no file, which is fine
         },
-        dispute: true,
         done: true,
       });
       const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
@@ -94,6 +93,12 @@ const Case5 = ({ id, account }) => {
           rep: updatedRep
         });
       }
+
+      const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
+        myTestContract.connect(starkAcnt);
+        await myTestContract.deny(qid, answerer).then(resp => {
+          console.log(resp);
+      });
     }
     Swal.fire({
       title: "Good job!",

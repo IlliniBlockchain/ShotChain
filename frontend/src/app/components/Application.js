@@ -56,7 +56,10 @@ const Application = ({ id }) => {
         ex = 5;
     } else if (questionData.done == false && questionData.answer.comment != "" && questionData.selected == account) {
        ex = 9;
-    } else if (questionData.done == true && (questionData.selected == account || questionData.address == account)) {
+    } else if (questionData.dispute == true && questionData.selected == account) {
+      ex = 10;
+    }
+    else if (questionData.done == true && (questionData.selected == account || questionData.address == account)) {
         ex = 6;
     } else if (questionData.done == false && questionData.address == account && questionData.selected != "") {
       ex = 7;
