@@ -120,7 +120,7 @@ const Case3 = ({ id, account }) => {
     <form onSubmit={handleAddComment} className="mb-32">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Answer Submission</h2>
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Congrats! You have been selected to answer this question</h2>
           <p className="mt-1 text-sm leading-6 text-gray-600">
             Please answer the poster's question with as much detail as possible
           </p>

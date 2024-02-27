@@ -5,6 +5,9 @@ import Navbar from "./components/Navbar";
 export const metadata = {
   title: "ShotChain",
   description: "Starknet Denver Hackathon 2024",
+  icons: {
+    icon: '/IlliniBlockchainLogo.png',
+  },
 };
 
 export default function RootLayout({ children }) {
