@@ -34,7 +34,8 @@ export default function Home() {
           const newTimestamp = itemDate.getTime() + addedTime;
           const newDate = new Date(newTimestamp);
           const currentDate = new Date();
-          return newDate > currentDate;
+          const done = item.done;
+          return newDate > currentDate && !done;
         });
 
         // filteredData = filteredData.slice().sort((a, b) => a.bounty - b.bounty).reverse()
@@ -94,12 +95,12 @@ export default function Home() {
               </p>
               <div className="flex flex-row my-16">
                 <div className="pr-12">
-                  <p className="font-bold sm:text-3xl mb-8">Business Strategy</p>
-                  <p className="sm:text-xl">We strive to effectively tackle our clients' short and long term business challenges across areas such as market entry, competitor analysis, acquisitions, product development, and more.</p>
+                  <p className="font-bold sm:text-3xl mb-8">Post Questions</p>
+                  <p className="sm:text-xl">Have a question related to cryptocurrency and smart contract auditing? Simply type your question and place a bounty to post your request to the public. Keep a look out for applicants who are willing to solve your problems!</p>
                 </div>
                 <div className="pl-12">
-                  <p className="font-bold sm:text-3xl mb-8">Tech Strategy</p>
-                  <p className="sm:text-xl">We specialize in assisting our client companies in their technical endeavors through analysis of emerging technologies, research of potential applications, writing whitepapers, and more.</p>
+                  <p className="font-bold sm:text-3xl mb-8">Answer Questions</p>
+                  <p className="sm:text-xl">Are you an expert in the space? Submit a brief statement and a resume to a live question to be considered for the job. If accepted, enter your answers directly to the question's page along with any supporting files!</p>
                 </div>
               </div>
             </div>
