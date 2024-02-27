@@ -46,10 +46,10 @@ const Case5 = ({ id, account }) => {
 
         const myTestContract = new Contract(jsonData, process.env.NEXT_PUBLIC_CONTRACT, provider);
         myTestContract.connect(starkAcnt);
-        await myTestContract.approve(10, answerer).then(resp => {
+        await myTestContract.approve(12, answerer).then(resp => {
           console.log(resp);
         });
-        }
+      }
     }
     if (rating == "Bad") {
       // Fetch the current user's data to get the rep score
