@@ -4,6 +4,7 @@ use starknet::ContractAddress;
 pub mod Errors {
     pub const APPROVAL_ISSUE: felt252 = 'question not approved!';
     pub const NOT_ANSWERED: felt252 = 'user did not answer!';
+    pub const ANSWERED: felt252 = 'user did answer in withdraw!';
     pub const ALREADY_ANSWERED: felt252 = 'already answered';
     pub const NOT_DISPUTED: felt252 = 'not disputed';
     pub const CALLER_ORACLE: felt252 = 'caller != oracle';
@@ -17,6 +18,8 @@ trait IEscrow<T> {
     fn approve(ref self: T, qid: u64, question_answerer: ContractAddress); //i like the answer, transfer money to escrow //fn approve(ref self: ContractState, qid: u64)
     fn deny(ref self: T, qid: u64, question_answerer: ContractAddress); //in dispute state // fn approve(ref self: ContractState, qid: u64)
     fn arbiter(ref self: T, qid: u64, question_maker: ContractAddress, decision: bool); //either approve or deny
+    fn withdraw(ref self: T, qid: u64, question_answerer: ContractAddress); //question maker wants to withdraw bc answerer didn't answer in time
+    fn dispute(ref self: T, qid: u64, question_maker: ContractAddress); //question maker never clicked approve or deny in time
 
     // getter for question id and answer id
     fn get_qid(self: @T) -> u64;
@@ -25,7 +28,8 @@ trait IEscrow<T> {
 }
 #[starknet::contract]
 mod Escrow {
-    use core::traits::TryInto;
+    use core::num::traits::zero::Zero;
+use core::traits::TryInto;
     use super::Errors;
     // use super::IERC20DispatcherTrait;
     // use super::IERC20Dispatcher;
@@ -93,8 +97,6 @@ mod Escrow {
 
             // add to Questions asked : Q's wallet addy, QID  -> Q's Wallet ADd (Temporarily)
             self.approvals.write((caller, current_qid), caller);
-
-
         }
 
         fn assign(ref self: ContractState, qid: u64, answerer: ContractAddress) { //DONE
@@ -127,6 +129,7 @@ mod Escrow {
             // let contract: ContractAddress = get_contract_address();
 
             //verify answered
+            assert(question_answerer.is_non_zero(), Errors::NOT_ANSWERED);
             assert(answerer == question_answerer, Errors::NOT_ANSWERED);
             assert(self.answers.read(qid) != 0, Errors::NOT_ANSWERED);
 
@@ -144,6 +147,7 @@ mod Escrow {
             let answerer: ContractAddress = self.approvals.read((caller, qid));
             
             //check if answerer answered
+            assert(question_answerer.is_non_zero(), Errors::NOT_ANSWERED);
             assert(answerer == question_answerer, Errors::NOT_ANSWERED);
             assert(self.answers.read(qid) != 0, Errors::NOT_ANSWERED);
 
@@ -160,6 +164,7 @@ mod Escrow {
 
             //verify disputer is the oracle
             let oracle: ContractAddress = self.oracle_addr.read();
+            assert(answerer.is_non_zero(), Errors::CALLER_ORACLE);
             assert(disputer == oracle, Errors::CALLER_ORACLE);
 
             //check if its in dispute
@@ -178,6 +183,43 @@ mod Escrow {
 
                 self.balances.write(qid, 0);
             }
+        }
+
+        //question maker wants to withdraw bc answerer didn't answer in time
+        fn withdraw(ref self: ContractState, qid: u64, question_answerer: ContractAddress) {
+            let caller: ContractAddress = get_caller_address();
+            let answerer: ContractAddress = self.approvals.read((caller, qid));
+            
+            // assert answer id is zero
+            assert(self.answers.read(qid).is_zero(), Errors::ANSWERED);
+            
+            //assert that the answerer is non-zero
+            assert(question_answerer.is_non_zero(), Errors::NOT_ANSWERED);
+            
+            // assert answerer is the one in mapping
+            assert(answerer == question_answerer, Errors::NOT_ANSWERED);
+            
+            // transfer the money from the contract to the caller
+            IERC20Dispatcher { contract_address: self.mint_addr.read(), }.transfer(caller, self.balances.read(qid));
+           
+            //balance to 0
+            self.balances.write(qid, 0);
+        }
+        
+        //ANSWERER calls
+        fn dispute(ref self: ContractState, qid: u64, question_maker: ContractAddress) { //question maker never clicked approve or deny in time
+            let caller: ContractAddress = get_caller_address();
+            
+            //approved answerer
+            assert(self.approvals.read((question_maker, qid)) == caller, Errors::APPROVAL_ISSUE);
+
+            //answered
+            assert(self.answers.read(qid) != 0, Errors::ALREADY_ANSWERED);
+
+            //ideally check a time until the answerer can dispute
+
+            //set this as a dispute status
+            self.dispute_status.write(qid, true);
         }
 
         fn get_qid(self: @ContractState) -> u64 {
